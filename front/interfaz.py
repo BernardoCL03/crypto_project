@@ -1,3 +1,7 @@
+'''
+Este archivo contiene los datos del frontend
+'''
+
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -81,4 +85,4 @@ if not st.session_state['migrant_data'].empty:
     plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
     st.pyplot(plt)
 else:
-    st.write("No data available for charts.")
+    st.write("No data available for charts.")/
