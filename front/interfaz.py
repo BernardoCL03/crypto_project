@@ -8,7 +8,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # Function to add a new migrant's data
-def add_migrant_data(name, age, country, arrival_date, status, gender, phone):
+def add_migrant_data(name: str, age: int, country: str, arrival_date, status, gender, phone):
     new_data = {
         'Nombre': name,
         'Edad': age,
@@ -85,4 +85,4 @@ if not st.session_state['migrant_data'].empty:
     plt.axis('equal')  # Equal aspect ratio ensures that pie is drawn as a circle.
     st.pyplot(plt)
 else:
-    st.write("No data available for charts.")/
+    st.write("No data available for charts.")

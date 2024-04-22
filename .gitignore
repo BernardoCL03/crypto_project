@@ -50,7 +50,10 @@ coverage.xml
 docs/_build/
 
 # Python Notebooks
-.ipynb
+*.ipynb
 
 # variables de entorno
 .env
+
+# Hash passwords
+*.pkl
