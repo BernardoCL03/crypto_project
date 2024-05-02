@@ -4,7 +4,7 @@ from back.database import SessionLocal
 import pandas as pd
 
 def dataframe_page():
-    st.title("Dataframe Visualization")
+    st.title("Visualización de Datos")
     # Use SessionLocal() context manager to handle the session lifecycle
     with SessionLocal() as session:
         # Query all data from the Migrant table
@@ -12,13 +12,13 @@ def dataframe_page():
         # Extract data into a list of dictionaries covering all model attributes
         data = [
             {
-                "Name": migrant.name,
-                "Age": migrant.age,
-                "Country": migrant.country,
-                "Arrival Date": migrant.arrival_date,
-                "Status": migrant.status,
-                "Gender": migrant.gender,
-                "Phone": migrant.phone
+                "Nombre": migrant.name,
+                "Edad": migrant.age,
+                "País": migrant.country,
+                "Fecha de Llegada": migrant.arrival_date,
+                "Estado": migrant.status,
+                "Género": migrant.gender,
+                "Teléfono": migrant.phone
             } for migrant in result
         ]
         # Convert list to DataFrame

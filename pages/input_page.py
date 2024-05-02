@@ -1,19 +1,17 @@
-
 import streamlit as st
 from back.model import SessionLocal, Migrant
 
-
 def input_page():
-    st.title("Input Data")
+    st.title("Ingresar Datos")
     with st.form(key='migrant_form'):
-        name = st.text_input("Name")
-        age = st.number_input("Age", min_value=0)
-        country = st.text_input("Country of Origin")
-        arrival_date = st.date_input("Arrival Date")
-        status = st.selectbox("Status", options=['Pending', 'Approved', 'Denied'])
-        gender = st.radio("Gender", options=['Male', 'Female', 'Other'])
-        phone = st.text_input("Phone Number")
-        submit_button = st.form_submit_button("Submit Data")
+        name = st.text_input("Nombre")
+        age = st.number_input("Edad", min_value=0)
+        country = st.text_input("País de Origen")
+        arrival_date = st.date_input("Fecha de Llegada")
+        status = st.selectbox("Estado", options=['Pendiente', 'Aprobado', 'Denegado'])
+        gender = st.radio("Género", options=['Masculino', 'Femenino', 'Otro'])
+        phone = st.text_input("Número de Teléfono")
+        submit_button = st.form_submit_button("Enviar Datos")
 
     if submit_button:
         with SessionLocal() as session:
@@ -23,7 +21,7 @@ def input_page():
             )
             session.add(new_migrant)
             session.commit()
-            st.success("Data submitted successfully!")
+            st.success("¡Datos ingresados exitosamente!")
 
 if __name__ == "__main__":
     input_page()
