@@ -1,5 +1,7 @@
 import streamlit as st
-from back.model import SessionLocal, Migrant
+from back.model import SessionLocal, Migrant # table name
+
+st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
 
 def input_page():
     st.title("Ingresar Datos")
