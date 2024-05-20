@@ -1,8 +1,8 @@
 
 import streamlit as st
-from pages.input_page import input_page
-from pages.dataframe_page import dataframe_page
-from pages.pie_chart_page import pie_chart_page
+# from pages.Registro_de_Migrantes import input_page
+# from pages.dataframe_page import dataframe_page
+# from pages.pie_chart_page import pie_chart_page
 from back.model import SessionLocal, User
 import bcrypt
 
@@ -34,12 +34,16 @@ if st.button('Iniciar Sesión'):
             # tenemos que asegurarnos de que el password ingresado (password) y el password dentro de la tabla (user.password_hash) sean bytes
             password_entered = password.encode('utf-8')
             password_stored = user.password_hash.encode('utf-8') if isinstance(user.password_hash, str) else user.password_hash
+
+            # nos interesa el id del usuario que esta loggueando
+            #user_id = session.query(User).filter(User.username) 
             
             # checamos que ambos hashes sean iguales
             if bcrypt.checkpw(password_entered, password_stored):
                 st.session_state['authenticated'] = True
                 st.session_state['user_type'] = user.user_type
                 st.session_state['username'] = username
+                st.session_state['id'] = user.id
                 st.success("Has iniciado sesión exitosamente!")
             else:
                 st.error('Nombre de usuario o contraseña incorrectos.')

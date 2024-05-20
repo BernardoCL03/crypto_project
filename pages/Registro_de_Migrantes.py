@@ -1,6 +1,7 @@
 import streamlit as st
 from back.model import SessionLocal, Migrant # table name
 
+
 st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
 
 def input_page():
@@ -26,4 +27,9 @@ def input_page():
             st.success("¡Datos ingresados exitosamente!")
 
 if __name__ == "__main__":
-    input_page()
+    st.title('Registro de migrantes :bust_in_silhouette:')
+    if st.session_state.get('authenticated'):
+        if st.session_state['user_type'] == 'Admin' or st.session_state['user_type'] == 'User':
+            input_page()
+    else:
+        st.error('Favor de iniciar sesión para acceder a esta página.')
