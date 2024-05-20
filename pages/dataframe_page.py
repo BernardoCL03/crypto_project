@@ -3,6 +3,8 @@ from back.model import Migrant
 from back.database import SessionLocal
 import pandas as pd
 
+st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
+
 def dataframe_page():
     st.title("Visualización de Datos")
     # Use SessionLocal() context manager to handle the session lifecycle

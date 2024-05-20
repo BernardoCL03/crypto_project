@@ -5,6 +5,8 @@ from back.database import SessionLocal
 import pandas as pd
 import matplotlib.pyplot as plt
 
+st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
+
 def pie_chart_country(session):
     result = session.query(Migrant.country, func.count(Migrant.country)).group_by(Migrant.country).all()
     if result:
