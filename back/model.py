@@ -1,7 +1,7 @@
 import os
 import logging
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import create_engine, Engine, Column, Integer, String, Date, Enum
+from sqlalchemy import create_engine, Engine, Column, Integer, String, Date, Enum, ForeignKey
 from sqlalchemy.engine import URL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
@@ -35,17 +35,98 @@ try:
     Base = declarative_base()
 
     # Base de datos de información general del migrante
-    class Migrant(Base):
-        __tablename__ = 'migrants'
-        id = Column(Integer, primary_key=True, autoincrement=True)
-        name = Column(String)
-        age = Column(Integer)
-        country = Column(String)
-        arrival_date = Column(Date)
-        status = Column(String)
-        gender = Column(String)
-        phone = Column(String, nullable=False)
+    # class Migrant(Base):
+    #     __tablename__ = 'migrants'
+    #     id = Column(Integer, primary_key=True, autoincrement=True)
+    #     name = Column(String)
+    #     age = Column(Integer)
+    #     country = Column(String)
+    #     arrival_date = Column(Date)
+    #     status = Column(String)
+    #     gender = Column(String)
+    #     phone = Column(String, nullable=False)
 
+    class General(Base):
+        __tablename__ = 'general'
+        id = Column(Integer, primary_key=True, autoincrement=True)
+        arrival_date = Column(Date, nullable=False)
+        type = Column(String, nullable=True)
+        name = Column(String, nullable=True)
+        last_name = Column(String, nullable=True)
+        gender = Column(String, nullable=True)
+        birth_date = Column(Date, nullable=False)
+        age = Column(Integer, nullable=False)
+        country_of_origin = Column(String, nullable=True)
+        civil_status = Column(String, nullable=True)
+        has_children = Column(String, nullable=True)
+        children_traveling = Column(Integer, nullable=False)
+        can_return_to_country = Column(String, nullable=True)
+        reason_cannot_return = Column(String, nullable=True)
+        access_to_casa_monarca = Column(String, nullable=True)
+        reason_for_denial = Column(String, nullable=True)
+        services_provided = Column(String, nullable=True)
+        assigned_dormitory = Column(String, nullable=True)
+        distinctive_signs = Column(String, nullable=True)
+        emergency_contact = Column(String, nullable=True)
+        emergency_contact_location = Column(String, nullable=True)
+        final_observations = Column(String, nullable=True)
+
+    class Transit(Base):
+        __tablename__ = 'transit'
+        id = Column(Integer, ForeignKey('general.id'), primary_key=True)
+        date_left_origin = Column(Date, nullable=False)
+        traveling_alone_accompanied = Column(String, nullable=True)
+        who_accompanied = Column(String, nullable=True)
+        which_relative = Column(String, nullable=True)
+        how_traveled = Column(String, nullable=True)
+        reason_for_leaving = Column(String, nullable=True)
+        abuse_during_travel = Column(String, nullable=True)
+        type_of_abuse = Column(String, nullable=True)
+        abuse_in_mexico = Column(String, nullable=True)
+        type_of_abuse_mexico = Column(String, nullable=True)
+        abuser = Column(String, nullable=True)
+        paid_guide = Column(String, nullable=True)
+        amount_paid = Column(String, nullable=True)
+        date_entered_mexico = Column(Date, nullable=False)
+        entry_point_mexico = Column(String, nullable=True)
+        final_destination = Column(String, nullable=True)
+        destination_monterrey = Column(String, nullable=True)
+        reason_stay_monterrey = Column(String, nullable=True)
+        support_network_monterrey = Column(String, nullable=True)
+        time_knowing_support = Column(String, nullable=True)
+        tried_enter_us = Column(String, nullable=True)
+        support_network_us = Column(String, nullable=True)
+        description_support_us = Column(String, nullable=True)
+        been_in_migration_station = Column(String, nullable=True)
+        suffered_aggression = Column(String, nullable=True)
+        migration_station_location = Column(String, nullable=True)
+        description_of_facts = Column(String, nullable=True)
+        filed_complaint = Column(String, nullable=True)
+        reason_no_complaint = Column(String, nullable=True)
+        solution_offered = Column(String, nullable=True)
+        stayed_in_shelter = Column(String, nullable=True)
+        last_shelter = Column(String, nullable=True)
+
+    class Health(Base):
+        __tablename__ = 'health'
+        id = Column(Integer, ForeignKey('general.id'), primary_key=True)
+        has_illness = Column(String, nullable=True)
+        illness_details = Column(String, nullable=True)
+        on_medical_treatment = Column(String, nullable=True)
+        medical_treatment_description = Column(String, nullable=True)
+        has_allergy = Column(String, nullable=True)
+        allergy_details = Column(String, nullable=True)
+        is_pregnant = Column(String, nullable=True)
+        months_pregnant = Column(String, nullable=True)
+        has_prenatal_care = Column(String, nullable=True)
+
+    class Education(Base):
+        __tablename__ = 'education'
+        id = Column(Integer, ForeignKey('general.id'), primary_key=True)
+        can_read_write = Column(String, nullable=True)
+        last_grade_study = Column(String, nullable=True)
+        languages_spoken = Column(String, nullable=True)
+        other_language = Column(String, nullable=True)
 
     class User(Base):
         __tablename__ = 'users'
