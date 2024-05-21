@@ -1,6 +1,6 @@
 import streamlit as st
 from back.model import Migrant
-from back.database import SessionLocal
+from back.model import SessionLocal
 import pandas as pd
 
 st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
