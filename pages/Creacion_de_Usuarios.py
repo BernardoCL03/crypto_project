@@ -80,5 +80,7 @@ if st.session_state.get('authenticated'): # authenticated es True si el usuario 
                 finally:
                     session.close()
 
+    if st.session_state['user_type'] == 'User':
+        st.error(f"¡Lo sentimos {st.session_state['username']}! Solamente usuarios con permisos de Admin tienen derecho a utilizar esta página.")
 else:
     st.error("Solamente usuarios con permisos de Admin tienen derecho a utilizar esta página, por favor inicia sesión.")

@@ -7,7 +7,7 @@ st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
 
 def input_page():
     st.title("Ingresar Datos")
-    with st.form(key='migrant_form'):
+    with (st.form(key='migrant_form')):
         arrival_date = st.date_input("Fecha de Llegada")
         type = st.selectbox('Tipo de registro', options=['Adulto', 'Niña acompañada', 'Niño acompañado', 'Adolescente acompañado', 'Niña no acompañada', 'Niño no acompañado', 'Adolescente no acompañado'])
         name = st.text_input("Nombre")
@@ -23,21 +23,18 @@ def input_page():
         last_grade_study = st.selectbox("Último Grado de Estudio", options=['Preescolar', 'Primaria', 'Secundaria', 'Bachillerato', 'Bachillerato Técnico', 'Universidad', 'No Escolarizado'])
         # TODO: fix languages to appear in db
         languages_spoken = st.multiselect("Idiomas que Habla", options=['Inglés', 'Español', 'Francés', 'Criollo Haitiano', 'Garífuna', 'Otro'])
-        other_language = st.text_input("Si Otro Idioma, Especifique") if languages_spoken == 'Otro' else 'NA'
+        other_language = st.text_input("Si habla otro idioma, especifique")
+        if 'Otro' not in languages_spoken:
+            other_language = 'NA'
         date_left_origin = st.date_input("Fecha en que Dejó el País de Origen", max_value=today, value=today)
-        traveling_alone_accompanied = st.radio("Viajando Solo o Acompañado", options=['Solo', 'Acompañado'])
+        traveling_alone_accompanied = st.radio("Viajando Solo o Acompañado", options=['Solo', 'Acompañado'], index=1)
         who_accompanied = st.radio("¿Por quién está siendo acompañado/a?", # TODO fix potential bug, algunas veces aparece, otras veces no...
                                    options=[
-                                       'Hijo/a',
-                                       'Pareja',
-                                       'Pareja e hijo/a',
-                                       'Mamá',
-                                       'Papá',
-                                       'Mamá y papá',
-                                       'Primo/a',
-                                       'Amigo/a',
+                                       'Hijo/a', 'Pareja', 'Pareja e hijo/a', 'Mamá', 'Papá', 'Mamá y papá','Primo/a','Amigo/a',
                                        'Otro pariente']) if traveling_alone_accompanied == 'Acompañado' else 'NA'
-        which_relative = st.text_input("¿Por cuál pariente salió acompañado?") if who_accompanied == 'Otro pariente' else 'NA'
+        which_relative = st.text_input("¿Por cuál pariente salió acompañado?")
+        if who_accompanied != 'Otro pariente':
+            which_relative = 'NA'
         how_traveled = st.text_input("¿Cómo viajó?")
         reason_for_leaving = st.text_input("¿Por qué razón tomó la decisión de salir de su país?")
         abuse_during_travel = st.radio("Durante su viaje desde que salió de su país hasta antes de llegar a México, ¿Usted sufrió de algún abuso a sus Derechos Humanos?", options=['Sí', 'No'])
@@ -82,11 +79,11 @@ def input_page():
         migration_station_location = st.text_input("¿En cuál Estado y/o País estuvo en una estación migratoria?") if been_in_migration_station == 'Sí' else 'NA'
         description_of_facts = st.text_area("Descripción de los hechos.") if been_in_migration_station == 'Sí' else 'NA'
         filed_complaint = st.radio("Ante las vivencias de abuso de autoridad, agresiones y vulnerabilidad a Derechos Humanos, ¿Usted interpuso una denuncia formal?",
-                                   options=['Sí', 'No']
+                                   options=['Sí', 'No'], index=1
                                    ) if been_in_migration_station == 'Sí' else 'NA'
         reason_no_complaint = st.text_input("¿Por qué razón no lo hizo?") if filed_complaint == 'No' else 'NA'
         solution_offered = st.text_input("¿Qué solución le brindaron?") if filed_complaint == 'Sí' else 'NA'
-        can_return_to_country = st.radio("¿Usted puede regresar a su país?",options=['Sí', 'No'])
+        can_return_to_country = st.radio("¿Usted puede regresar a su país?",options=['Sí', 'No'], index=1)
         reason_cannot_return = st.text_input("¿Por qué razón no puede regresar a su país?") if can_return_to_country == 'No' else 'NA'
         has_illness = st.radio("¿Actualmente usted padece alguna enfermedad?",options=['Sí', 'No'])
         illness_details = st.text_input("¿Cuál enfermedad padece?") if has_illness == 'Sí' else 'NA'
@@ -95,11 +92,11 @@ def input_page():
         has_allergy = st.radio("¿Usted padece algún tipo de alergia?",options=['Sí', 'No'])
         allergy_details = st.text_input("Tipo de alergia o a qué es alérgico/a") if has_allergy == 'Sí' else 'NA'
         is_pregnant = st.radio("¿Actualmente usted está embarazada?",options=['Sí', 'No', 'NA'])
-        months_pregnant = st.radio("¿Cuántos meses de embarazo tiene?", options=[str(n) + " mes(es)" for n in range(1, 10)]) if is_pregnant == 'Sí' else 'NA'
+        months_pregnant = st.radio("¿Cuántos meses de embarazo tiene?", options=['1 mes', '2 meses', '3 meses', '4 meses', '5 meses', '6 meses', '7 meses', '8 meses', '9 meses', 'NA'],) if is_pregnant == 'Sí' else 'NA'
         has_prenatal_care = st.radio("¿Cuenta con control prenatal?",options=['Sí', 'No']) if is_pregnant == 'Sí' else 'NA'
         stayed_in_shelter = st.radio("En su trayecto por México, ¿Usted se ha estado en algún otro albergue?",options=['Sí', 'No'])
         last_shelter = st.text_input("¿Cuál fue el último albergue en el que estuvo?")
-        access_to_casa_monarca = st.radio("¿Se le brindó acceso al albergue de Casa Monarca?",options=['Sí', 'No'])
+        access_to_casa_monarca = st.radio("¿Se le brindó acceso al albergue de Casa Monarca?",options=['Sí', 'No'], index=1)
         reason_for_denial = st.text_input("¿Por qué se le negó el acceso al albergue?") if access_to_casa_monarca == 'No' else 'NA'
         services_provided = st.multiselect(
             "¿Cuáles servicios se le brindaron a la persona?",
@@ -145,7 +142,7 @@ def input_page():
                 civil_status=civil_status, has_children=has_children, children_traveling=children_traveling,
                 can_return_to_country=can_return_to_country, reason_cannot_return=reason_cannot_return,
                 access_to_casa_monarca=access_to_casa_monarca, reason_for_denial=reason_for_denial,
-                services_provided=services_provided, assigned_dormitory=assigned_dormitory,
+                services_provided=(', '.join(services_provided)), assigned_dormitory=assigned_dormitory,
                 distinctive_signs=distinctive_signs, emergency_contact=emergency_contact,
                 emergency_contact_location=emergency_contact_location, final_observations=final_observations
             )
@@ -155,7 +152,7 @@ def input_page():
             # Use the ID from the general record for related tables
             new_education = Education(
                 id=new_general.id, can_read_write=can_read_write, last_grade_study=last_grade_study,
-                languages_spoken=languages_spoken, other_language=other_language
+                languages_spoken=(','.join(languages_spoken)), other_language=other_language
             )
             new_health = Health(
                 id=new_general.id, has_illness=has_illness, illness_details=illness_details,
@@ -188,9 +185,6 @@ def input_page():
             # Commit all changes
             session.commit()
 
-            # close session
-            session.close()
-    
             st.success("¡Datos ingresados exitosamente!")
 
 

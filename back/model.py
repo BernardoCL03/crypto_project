@@ -19,7 +19,7 @@ load_dotenv(dotenv_path=dotenv_path)
 
 # Define the SQL engine, SQLite is used here for simplicity
 CONN_STRING = os.getenv('DATABASE_URL')
-print(CONN_STRING)
+#print(CONN_STRING)
 
 ENGINE_URL = URL.create(
     drivername="mssql+pyodbc",
