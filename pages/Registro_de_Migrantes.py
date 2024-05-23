@@ -1,9 +1,8 @@
 import os
 import streamlit as st
 import base64
-import pyotp
 from datetime import datetime, timedelta
-from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
+from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from back.model import SessionLocal, Health, Education, Transit, General # table names
 from back.encrypt import encrypt_data
 from dotenv import load_dotenv
@@ -218,9 +217,9 @@ if __name__ == "__main__":
             load_dotenv(dotenv_path=dotenv_path)
 
             # leemos en formato base64, tenemos que convertirla a objeto valido
-            PUBLIC_KEY_base64 = os.getenv('PUBLIC_KEY')
-            PUBLIC_KEY_pem = base64.b64decode(PUBLIC_KEY_base64)
-            PUBLIC_KEY = load_pem_public_key(PUBLIC_KEY_pem)
+            public_key_base64 = os.getenv('PUBLIC_KEY')
+            public_key_pem = base64.b64decode(public_key_base64)
+            PUBLIC_KEY = load_pem_public_key(public_key_pem)
 
             input_page()
     else:
