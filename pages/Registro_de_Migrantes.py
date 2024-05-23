@@ -1,6 +1,12 @@
+import os
 import streamlit as st
+import base64
+import pyotp
 from datetime import datetime, timedelta
+from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
 from back.model import SessionLocal, Health, Education, Transit, General # table names
+from back.encrypt import encrypt_data
+from dotenv import load_dotenv
 
 
 st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
@@ -131,20 +137,33 @@ def input_page():
         emergency_contact = st.text_input("Contacto de emergencia")
         emergency_contact_location = st.text_input("Geográficamente, ¿Dónde se encuentra su contacto de emergencia? País, Estado, Ciudad, Departamento, Comunidad, etc.")
         final_observations = st.text_area("Observaciones finales.")
-        submit_button = st.form_submit_button("Enviar Datos")
+        submit_button = st.form_submit_button("Encriptar datos y subir a la base de datos.")
 
     if submit_button:
         with SessionLocal() as session:
             # First, create and add the general record
             new_general = General(
-                arrival_date=arrival_date, type=type, name=name, last_name=last_name,
-                gender=gender, birth_date=birth_date, age=age, country_of_origin=country_of_origin,
-                civil_status=civil_status, has_children=has_children, children_traveling=children_traveling,
-                can_return_to_country=can_return_to_country, reason_cannot_return=reason_cannot_return,
-                access_to_casa_monarca=access_to_casa_monarca, reason_for_denial=reason_for_denial,
-                services_provided=(', '.join(services_provided)), assigned_dormitory=assigned_dormitory,
-                distinctive_signs=distinctive_signs, emergency_contact=emergency_contact,
-                emergency_contact_location=emergency_contact_location, final_observations=final_observations
+                arrival_date=encrypt_data(PUBLIC_KEY, arrival_date),
+                type=encrypt_data(PUBLIC_KEY, type),
+                name=encrypt_data(PUBLIC_KEY, name),
+                last_name=encrypt_data(PUBLIC_KEY, last_name),
+                gender=encrypt_data(PUBLIC_KEY, gender),
+                birth_date=encrypt_data(PUBLIC_KEY, birth_date),  # Convertimos la fecha a string para encriptarla
+                age=encrypt_data(PUBLIC_KEY, str(age)),  # Convertimos el número a string para encriptar
+                country_of_origin=encrypt_data(PUBLIC_KEY, country_of_origin),
+                civil_status=encrypt_data(PUBLIC_KEY, civil_status),
+                has_children=encrypt_data(PUBLIC_KEY, str(has_children)),  # Convertimos el booleano a string para encriptar
+                children_traveling=encrypt_data(PUBLIC_KEY, str(children_traveling)),  # Convertimos el número a string para encriptar
+                can_return_to_country=encrypt_data(PUBLIC_KEY, str(can_return_to_country)),  # Convertimos el booleano a string para encriptar
+                reason_cannot_return=encrypt_data(PUBLIC_KEY, reason_cannot_return),
+                access_to_casa_monarca=encrypt_data(PUBLIC_KEY, str(access_to_casa_monarca)),  # Convertimos el booleano a string para encriptar
+                reason_for_denial=encrypt_data(PUBLIC_KEY, reason_for_denial),
+                services_provided=encrypt_data(PUBLIC_KEY, ', '.join(services_provided)),  # Concatenamos y encriptamos
+                assigned_dormitory=encrypt_data(PUBLIC_KEY, assigned_dormitory),
+                distinctive_signs=encrypt_data(PUBLIC_KEY, distinctive_signs),
+                emergency_contact=encrypt_data(PUBLIC_KEY, emergency_contact),
+                emergency_contact_location=encrypt_data(PUBLIC_KEY, emergency_contact_location),
+                final_observations=encrypt_data(PUBLIC_KEY, final_observations)
             )
             session.add(new_general)
             session.commit()  # Commit to get the ID
@@ -194,6 +213,15 @@ if __name__ == "__main__":
     min_date = today - timedelta(days=365.25 * 100)
     if st.session_state.get('authenticated'):
         if st.session_state['user_type'] == 'Admin' or st.session_state['user_type'] == 'User':
+            # cargamos .env
+            dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+            load_dotenv(dotenv_path=dotenv_path)
+
+            # leemos en formato base64, tenemos que convertirla a objeto valido
+            PUBLIC_KEY_base64 = os.getenv('PUBLIC_KEY')
+            PUBLIC_KEY_pem = base64.b64decode(PUBLIC_KEY_base64)
+            PUBLIC_KEY = load_pem_public_key(PUBLIC_KEY_pem)
+
             input_page()
     else:
         st.error('Favor de iniciar sesión para acceder a esta página.')
