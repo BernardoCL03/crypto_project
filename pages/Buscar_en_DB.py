@@ -8,12 +8,10 @@ from back.encrypt import decrypt_data
 from back.model import SessionLocal, General, Transit, Health, Education
 from sqlalchemy.orm import joinedload
 import pandas as pd
-
 # our decrypt data function
 from back.encrypt import decrypt_data
 
-st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
-
+# función para desencriptar todos los dataos guardados en la base de datos
 def admin_decrypt_page(private_key):
     with SessionLocal() as session:
         general_query = session.query(General).all()
@@ -106,6 +104,8 @@ def admin_decrypt_page(private_key):
 
         return data
 
+st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
+
 # Iniciamos la página
 if __name__ == "__main__":
     st.title(':exclamation: Admin Decryption :exclamation:')
@@ -157,11 +157,6 @@ if __name__ == "__main__":
 
                 Agradezemos su compromiso con la seguridad y el respeto por la privacidad de los individuos cuyos datos están a nuestro cuidado.
             """)
-
-            # cargamos variables de ambiente 
-            #dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
-            #load_dotenv(dotenv_path=dotenv_path)
-            #TOTP_SECRET = os.getenv("TOTP_SECRET")
 
             # leemos en formato base64, tenemos que convertirla a objeto valido
             private_key_base64 = os.getenv('PRIVATE_KEY')
