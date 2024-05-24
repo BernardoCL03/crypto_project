@@ -55,6 +55,7 @@ def login():
                     st.session_state['authenticated'] = True
                     st.session_state['username'] = username
                     st.session_state['id'] = user.id
+                    st.session_state['user_type'] = user.user_type
                     st.success(f"Has iniciado sesión exitosamente {st.session_state['username']}")
                     time.sleep(1.5)
                     st.rerun()
