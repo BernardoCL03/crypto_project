@@ -116,27 +116,6 @@ if __name__ == "__main__":
             st.session_state['otp_verified'] = False
         
         if not st.session_state['otp_verified']:
-            st.write("Ingrese la OTP para acceder a esta página")
-            opt_input = st.text_input("OTP", type = "password")
-
-            dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
-            load_dotenv(dotenv_path=dotenv_path)
-            TOTP_SECRET = os.getenv("TOTP_SECRET")
-
-            totp = pyotp.TOTP(TOTP_SECRET)
-            if st.button("Verificar OTP"):
-                if totp.verify(opt_input):
-                    st.session_state['otp_verified'] = True
-                    st.success("OTP verificada correctamente")
-                    st.experimental_rerun()
-                else:
-                    st.error("OTP incorrecta, favor de intentar de nuevo")
-
-        if st.session_state['otp_verified']:
-
-            dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
-            load_dotenv(dotenv_path=dotenv_path)
-            TOTP_SECRET = os.getenv("TOTP_SECRET")
 
             st.markdown("""
                 #### Bienvenido a la sección de administración. Esta página está diseñada exclusivamente para el acceso y la gestión por parte de administradores autorizados.
@@ -157,6 +136,28 @@ if __name__ == "__main__":
 
                 Agradezemos su compromiso con la seguridad y el respeto por la privacidad de los individuos cuyos datos están a nuestro cuidado.
             """)
+
+            st.warning("Ingrese la OTP para acceder a esta página")
+            opt_input = st.text_input("OTP", type = "password")
+
+            dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+            load_dotenv(dotenv_path=dotenv_path)
+            TOTP_SECRET = os.getenv("TOTP_SECRET")
+
+            totp = pyotp.TOTP(TOTP_SECRET)
+            if st.button("Verificar OTP"):
+                if totp.verify(opt_input):
+                    st.session_state['otp_verified'] = True
+                    st.success("OTP verificada correctamente")
+                    st.experimental_rerun()
+                else:
+                    st.error("OTP incorrecta, favor de intentar de nuevo")
+
+        if st.session_state['otp_verified']:
+
+            dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+            load_dotenv(dotenv_path=dotenv_path)
+            TOTP_SECRET = os.getenv("TOTP_SECRET")
 
             # leemos en formato base64, tenemos que convertirla a objeto valido
             private_key_base64 = os.getenv('PRIVATE_KEY')
