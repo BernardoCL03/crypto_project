@@ -149,7 +149,7 @@ if __name__ == "__main__":
                 if totp.verify(opt_input):
                     st.session_state['otp_verified'] = True
                     st.success("OTP verificada correctamente")
-                    st.experimental_rerun()
+                    st.rerun()
                 else:
                     st.error("OTP incorrecta, favor de intentar de nuevo")
 
@@ -174,34 +174,44 @@ if __name__ == "__main__":
             all_names = df['full_name'].unique()
             # Crear un menú desplegable con los nombres
         
+            # Crear un menú desplegable con los nombres
             selected_migrant = st.selectbox('Seleccione un nombre', ['Seleccione'] + list(all_names))
-            
+
             if selected_migrant != 'Seleccione':
-                 data_type = st.selectbox('Seleccione el tipo de dato', ['Seleccione','General', 'Health', 'Transit', 'Education'])
-                 
-                 if data_type != 'Seleccione':
-                    # Filtrar el DataFrame según el nombre seleccionado
-                    df_migrant = df[df['full_name'] == selected_migrant]
+                # Filtrar los IDs correspondientes al nombre seleccionado
+                ids_for_name = df[df['full_name'] == selected_migrant]['id'].unique()
+                if len(ids_for_name) > 1:
+                    st.write(f"Parece que hay múltiples registros bajo el nombre {selected_migrant}")
+                    selected_id = st.selectbox('Seleccione el ID', ['Seleccione'] + list(ids_for_name))
+                else:
+                    selected_id = ids_for_name[0]
 
-                    if data_type == 'General':
-                        columnas = [col for col in df_migrant.columns if not any(prefix in col for prefix in ['transit', 'health', 'education'])]
-                        columnas.remove('full_name')
-                    elif data_type == 'Health':
-                        columnas = [col for col in df_migrant.columns if 'health' in col]
-                    elif data_type == 'Transit':
-                        columnas = [col for col in df_migrant.columns if 'transit' in col]
-                    elif data_type == 'Education':
-                        columnas = [col for col in df_migrant.columns if 'education' in col]
-                    # Mostrar el DataFrame filtrado sin el índice
-                    
-                    df_seleccionado = df_migrant[columnas]
-                    # Transponer el DataFrame
-                    df_transpuesto = df_seleccionado.transpose()
+                if selected_id != 'Seleccione':
+                    data_type = st.selectbox('Seleccione el tipo de dato', ['Seleccione', 'General', 'Health', 'Transit', 'Education'])
 
-                    # Corregir los nombres de las columnas
-                    df_transpuesto.columns = [selected_migrant]
+                    if data_type != 'Seleccione':
+                        # Filtrar el DataFrame según el nombre y el ID seleccionados
+                        df_migrant = df[(df['full_name'] == selected_migrant) & (df['id'] == selected_id)]
 
-                    st.dataframe(df_transpuesto, width=1200, height=600)
+                        if data_type == 'General':
+                            columnas = [col for col in df_migrant.columns if not any(prefix in col for prefix in ['transit', 'health', 'education'])]
+                            columnas.remove('full_name')
+                        elif data_type == 'Health':
+                            columnas = [col for col in df_migrant.columns if 'health' in col]
+                        elif data_type == 'Transit':
+                            columnas = [col for col in df_migrant.columns if 'transit' in col]
+                        elif data_type == 'Education':
+                            columnas = [col for col in df_migrant.columns if 'education' in col]
+
+                        # Mostrar el DataFrame filtrado sin el índice
+                        df_seleccionado = df_migrant[columnas]
+                        # Transponer el DataFrame
+                        df_transpuesto = df_seleccionado.transpose()
+
+                        # Corregir los nombres de las columnas
+                        df_transpuesto.columns = [selected_migrant]
+
+                        st.dataframe(df_transpuesto, width=1200, height=600)
     
     elif st.session_state.get('authenticated') and st.session_state['user_type'] == 'User':
         st.error('No tienes permisos para acceder a esta página.')
