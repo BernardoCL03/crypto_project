@@ -10,6 +10,13 @@ from dotenv import load_dotenv
 
 st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
 
+if st.session_state.get('authenticated'):
+    st.sidebar.write(f"Usuario: {st.session_state['username']}")
+    st.sidebar.write(f"Permisos: {st.session_state['user_type']}")
+    if st.sidebar.button("Cerrar sesión"):
+        # Al hacer clic en cerrar sesión, cambiamos el estado a no autenticado
+        st.session_state.authenticated = False
+
 def input_page():
     st.title("Ingresar Datos")
     with (st.form(key='migrant_form')):

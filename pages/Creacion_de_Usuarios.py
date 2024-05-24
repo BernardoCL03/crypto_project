@@ -3,8 +3,15 @@ from sqlalchemy.exc import IntegrityError
 import streamlit as st
 import re
 
-## Pagina para la creacion de usuarios. Únicamente debe ser accesible si se trata de un admin.
 st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
+
+if st.session_state.get('authenticated'):
+    st.sidebar.write(f"Usuario: {st.session_state['username']}")
+    st.sidebar.write(f"Permisos: {st.session_state['user_type']}")
+    if st.sidebar.button("Cerrar sesión"):
+        # Al hacer clic en cerrar sesión, cambiamos el estado a no autenticado
+        st.session_state.authenticated = False
+
 st.title('Página de creación de usuarios :bust_in_silhouette: :white_check_mark:')
 
 if st.session_state.get('authenticated'): # authenticated es True si el usuario ya se autentico, y False, si no.
@@ -83,4 +90,4 @@ if st.session_state.get('authenticated'): # authenticated es True si el usuario 
     if st.session_state['user_type'] == 'User':
         st.error(f"¡Lo sentimos {st.session_state['username']}! Solamente usuarios con permisos de Admin tienen derecho a utilizar esta página.")
 else:
-    st.error("Solamente usuarios con permisos de Admin tienen derecho a utilizar esta página, por favor inicia sesión.")
+    st.error("Favor de iniciar sesión para acceder a esta página.")

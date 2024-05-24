@@ -5,6 +5,13 @@ import time
 
 st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
 
+if st.session_state.get('authenticated'):
+    st.sidebar.write(f"Usuario: {st.session_state['username']}")
+    st.sidebar.write(f"Permisos: {st.session_state['user_type']}")
+    if st.sidebar.button("Cerrar sesión"):
+        # Al hacer clic en cerrar sesión, cambiamos el estado a no autenticado
+        st.session_state.authenticated = False
+
 def menu_principal(username):
     st.markdown("""
             # Bienvenido al Sistema de Gestión de Migrantes de casa Monarca :butterfly:
@@ -19,15 +26,19 @@ def menu_principal(username):
 
             ### 2. **Buscar en DB**
             - **Descripción**: Funcionalidad exclusiva para administradores que permite realizar consultas específicas dentro de la base de datos para acceder a la información registrada de los migrantes.
-            - **Acceso**: Solo administradores.
+            - **Acceso**: Administradores.
 
             ### 3. **Creación de Usuarios**
             - **Descripción**: Esta sección está reservada para los administradores, quienes pueden crear nuevos usuarios asignando credenciales de acceso como administrador o usuario normal.
-            - **Acceso**: Solo administradores.
+            - **Acceso**: Administradores.
 
             ### 4. **Ver Usuarios**
             - **Descripción**: Permite a los administradores visualizar una lista de todos los usuarios registrados en el sistema, mostrando detalles como el nombre de usuario y el tipo de acceso que poseen.
-            - **Acceso**: Solo administradores.
+            - **Acceso**: Administradores.
+                
+            ### 5. **Visualizar datos**
+            - **Descripción**: Permite a usuarios y administradores la posibilidad de ver gráficas interactivas y atractivas.
+            - **Acceso**: Usuarios y administradores.
 
             ## Nota Importante
             Este sistema maneja información sensible. Es crucial mantener la confidencialidad y la seguridad de los datos en todo momento. Cada usuario debe adherirse a las normas de seguridad establecidas para garantizar la protección de la información.

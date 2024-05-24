@@ -11,6 +11,15 @@ import pandas as pd
 # our decrypt data function
 from back.encrypt import decrypt_data
 
+st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
+
+if st.session_state.get('authenticated'):
+    st.sidebar.write(f"Usuario: {st.session_state['username']}")
+    st.sidebar.write(f"Permisos: {st.session_state['user_type']}")
+    if st.sidebar.button("Cerrar sesión"):
+        # Al hacer clic en cerrar sesión, cambiamos el estado a no autenticado
+        st.session_state.authenticated = False
+
 # función para desencriptar todos los dataos guardados en la base de datos
 def admin_decrypt_page(private_key):
     with SessionLocal() as session:
@@ -104,7 +113,6 @@ def admin_decrypt_page(private_key):
 
         return data
 
-st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
 
 # Iniciamos la página
 if __name__ == "__main__":
@@ -217,5 +225,5 @@ if __name__ == "__main__":
         st.error('No tienes permisos para acceder a esta página.')
     
     else:
-        st.error('Favor de iniciar sesión.')
+        st.error('Favor de iniciar sesión para acceder a esta página.')
         
