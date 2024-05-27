@@ -70,11 +70,14 @@ try:
         emergency_contact = Column(String(1024), nullable=True)
         emergency_contact_location = Column(String(1024), nullable=True)
         final_observations = Column(String(1024), nullable=True)
+        front_photo = Column(String, nullable=True)
+        right_profile_photo = Column(String, nullable=True)
+        left_profile_photo = Column(String, nullable=True)
 
     class Transit(Base):
         __tablename__ = 'transit'
         id = Column(Integer, ForeignKey('general.id'), primary_key=True)
-        date_left_origin = Column(Date, nullable=False)
+        date_left_origin = Column(String, nullable=False)
         traveling_alone_accompanied = Column(String, nullable=True)
         who_accompanied = Column(String, nullable=True)
         which_relative = Column(String, nullable=True)
@@ -87,7 +90,7 @@ try:
         abuser = Column(String, nullable=True)
         paid_guide = Column(String, nullable=True)
         amount_paid = Column(String, nullable=True)
-        date_entered_mexico = Column(Date, nullable=False)
+        date_entered_mexico = Column(String, nullable=False)
         entry_point_mexico = Column(String, nullable=True)
         final_destination = Column(String, nullable=True)
         destination_monterrey = Column(String, nullable=True)
@@ -133,7 +136,7 @@ try:
         id = Column(Integer, primary_key=True, autoincrement=True)
         username = Column(String(50), unique=True, nullable=False)
         password_hash = Column(String, nullable=False)
-        user_type = Column(Enum('User','Admin', name = 'user_types'), default='user', nullable=False)
+        user_type = Column(Enum('User','Admin', name = 'user_types'), default='User', nullable=False)
 
         def set_password(self, password):
             self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
