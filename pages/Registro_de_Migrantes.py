@@ -4,9 +4,17 @@ import base64
 from datetime import datetime, timedelta
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from back.model import SessionLocal, Health, Education, Transit, General # table names
-from back.encrypt import encrypt_data
+from back.encrypt import encrypt_data, encrypt_large_data
 from dotenv import load_dotenv
+from PIL import Image
+import io
 
+def process_photo(photo):
+    image = Image.open(photo)
+    image = image.resize((128, 128))  # Redimensionar la imagen
+    buffer = io.BytesIO()
+    image.save(buffer, format='PNG')
+    return base64.b64encode(buffer.getvalue()).decode('utf-8')
 
 st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
 
@@ -143,10 +151,17 @@ def input_page():
         emergency_contact = st.text_input("Contacto de emergencia")
         emergency_contact_location = st.text_input("Geográficamente, ¿Dónde se encuentra su contacto de emergencia? País, Estado, Ciudad, Departamento, Comunidad, etc.")
         final_observations = st.text_area("Observaciones finales.")
+        front_photo = st.file_uploader("Subir foto de frente", type=["jpg", "jpeg", "png"])
+        right_profile_photo = st.file_uploader("Subir foto de perfil derecho", type=["jpg", "jpeg", "png"])
+        left_profile_photo = st.file_uploader("Subir foto de perfil izquierdo", type=["jpg", "jpeg", "png"])
+
         submit_button = st.form_submit_button("Encriptar datos y subir a la base de datos.")
 
     if submit_button:
         with SessionLocal() as session:
+            encrypted_front_photo = encrypt_large_data(PUBLIC_KEY, process_photo(front_photo).encode('utf-8'))
+            encrypted_right_profile_photo = encrypt_large_data(PUBLIC_KEY, process_photo(right_profile_photo).encode('utf-8'))
+            encrypted_left_profile_photo = encrypt_large_data(PUBLIC_KEY, process_photo(left_profile_photo).encode('utf-8'))
             # First, create and add the general record
             new_general = General(
                 arrival_date=encrypt_data(PUBLIC_KEY, arrival_date),
@@ -154,7 +169,7 @@ def input_page():
                 name=encrypt_data(PUBLIC_KEY, name),
                 last_name=encrypt_data(PUBLIC_KEY, last_name),
                 gender=encrypt_data(PUBLIC_KEY, gender),
-                birth_date=encrypt_data(PUBLIC_KEY, birth_date),  # Convertimos la fecha a string para encriptarla
+                birth_date=encrypt_data(PUBLIC_KEY, birth_date),
                 age=encrypt_data(PUBLIC_KEY, str(age)),  # Convertimos el número a string para encriptar
                 country_of_origin=encrypt_data(PUBLIC_KEY, country_of_origin),
                 civil_status=encrypt_data(PUBLIC_KEY, civil_status),
@@ -169,38 +184,69 @@ def input_page():
                 distinctive_signs=encrypt_data(PUBLIC_KEY, distinctive_signs),
                 emergency_contact=encrypt_data(PUBLIC_KEY, emergency_contact),
                 emergency_contact_location=encrypt_data(PUBLIC_KEY, emergency_contact_location),
-                final_observations=encrypt_data(PUBLIC_KEY, final_observations)
+                final_observations=encrypt_data(PUBLIC_KEY, final_observations),
+                front_photo = ",".join(encrypted_front_photo),
+                right_profile_photo=",".join(encrypted_right_profile_photo),
+                left_profile_photo=",".join(encrypted_left_profile_photo)
             )
             session.add(new_general)
             session.commit()  # Commit to get the ID
     
             # Use the ID from the general record for related tables
             new_education = Education(
-                id=new_general.id, can_read_write=can_read_write, last_grade_study=last_grade_study,
-                languages_spoken=(','.join(languages_spoken)), other_language=other_language
+            id=new_general.id,
+            can_read_write=encrypt_data(PUBLIC_KEY, can_read_write),
+            last_grade_study=encrypt_data(PUBLIC_KEY, last_grade_study),
+            languages_spoken=encrypt_data(PUBLIC_KEY, ','.join(languages_spoken)),
+            other_language=encrypt_data(PUBLIC_KEY, other_language)
             )
             new_health = Health(
-                id=new_general.id, has_illness=has_illness, illness_details=illness_details,
-                on_medical_treatment=on_medical_treatment, medical_treatment_description=medical_treatment_description,
-                has_allergy=has_allergy, allergy_details=allergy_details, is_pregnant=is_pregnant,
-                months_pregnant=months_pregnant, has_prenatal_care=has_prenatal_care
+            id=new_general.id,
+            has_illness=encrypt_data(PUBLIC_KEY, has_illness),
+            illness_details=encrypt_data(PUBLIC_KEY, illness_details),
+            on_medical_treatment=encrypt_data(PUBLIC_KEY, on_medical_treatment),
+            medical_treatment_description=encrypt_data(PUBLIC_KEY, medical_treatment_description),
+            has_allergy=encrypt_data(PUBLIC_KEY, has_allergy),
+            allergy_details=encrypt_data(PUBLIC_KEY, allergy_details),
+            is_pregnant=encrypt_data(PUBLIC_KEY, is_pregnant),
+            months_pregnant=encrypt_data(PUBLIC_KEY, months_pregnant),
+            has_prenatal_care=encrypt_data(PUBLIC_KEY, has_prenatal_care)
             )
             new_transit = Transit(
-                id=new_general.id, date_left_origin=date_left_origin, traveling_alone_accompanied=traveling_alone_accompanied,
-                who_accompanied=who_accompanied, which_relative=which_relative, how_traveled=how_traveled,
-                reason_for_leaving=reason_for_leaving, abuse_during_travel=abuse_during_travel, type_of_abuse=type_of_abuse,
-                abuse_in_mexico=abuse_in_mexico, type_of_abuse_mexico=type_of_abuse_mexico, abuser=abuser,
-                paid_guide=paid_guide, amount_paid=amount_paid, date_entered_mexico=date_entered_mexico,
-                entry_point_mexico=entry_point_mexico, final_destination=final_destination,
-                destination_monterrey=destination_monterrey, reason_stay_monterrey=reason_stay_monterrey,
-                support_network_monterrey=support_network_monterrey, time_knowing_support=time_knowing_support,
-                tried_enter_us=tried_enter_us, support_network_us=support_network_us,
-                description_support_us=description_support_us, been_in_migration_station=been_in_migration_station,
-                suffered_aggression=suffered_aggression, migration_station_location=migration_station_location,
-                description_of_facts=description_of_facts, filed_complaint=filed_complaint,
-                reason_no_complaint=reason_no_complaint, solution_offered=solution_offered,
-                stayed_in_shelter=stayed_in_shelter, last_shelter=last_shelter
-            )
+            id=new_general.id,
+            date_left_origin=encrypt_data(PUBLIC_KEY, date_left_origin),  # Convertimos la fecha a string para encriptarla
+            traveling_alone_accompanied=encrypt_data(PUBLIC_KEY, traveling_alone_accompanied),
+            who_accompanied=encrypt_data(PUBLIC_KEY, who_accompanied),
+            which_relative=encrypt_data(PUBLIC_KEY, which_relative),
+            how_traveled=encrypt_data(PUBLIC_KEY, how_traveled),
+            reason_for_leaving=encrypt_data(PUBLIC_KEY, reason_for_leaving),
+            abuse_during_travel=encrypt_data(PUBLIC_KEY, abuse_during_travel),
+            type_of_abuse=encrypt_data(PUBLIC_KEY, type_of_abuse),
+            abuse_in_mexico=encrypt_data(PUBLIC_KEY, abuse_in_mexico),
+            type_of_abuse_mexico=encrypt_data(PUBLIC_KEY, type_of_abuse_mexico),
+            abuser=encrypt_data(PUBLIC_KEY, abuser),
+            paid_guide=encrypt_data(PUBLIC_KEY, paid_guide),
+            amount_paid=encrypt_data(PUBLIC_KEY, amount_paid),
+            date_entered_mexico=encrypt_data(PUBLIC_KEY, date_entered_mexico),  # Convertimos la fecha a string para encriptarla
+            entry_point_mexico=encrypt_data(PUBLIC_KEY, entry_point_mexico),
+            final_destination=encrypt_data(PUBLIC_KEY, final_destination),
+            destination_monterrey=encrypt_data(PUBLIC_KEY, destination_monterrey),
+            reason_stay_monterrey=encrypt_data(PUBLIC_KEY, reason_stay_monterrey),
+            support_network_monterrey=encrypt_data(PUBLIC_KEY, support_network_monterrey),
+            time_knowing_support=encrypt_data(PUBLIC_KEY, time_knowing_support),
+            tried_enter_us=encrypt_data(PUBLIC_KEY, tried_enter_us),
+            support_network_us=encrypt_data(PUBLIC_KEY, support_network_us),
+            description_support_us=encrypt_data(PUBLIC_KEY, description_support_us),
+            been_in_migration_station=encrypt_data(PUBLIC_KEY, been_in_migration_station),
+            suffered_aggression=encrypt_data(PUBLIC_KEY, suffered_aggression),
+            migration_station_location=encrypt_data(PUBLIC_KEY, migration_station_location),
+            description_of_facts=encrypt_data(PUBLIC_KEY, description_of_facts),
+            filed_complaint=encrypt_data(PUBLIC_KEY, filed_complaint),
+            reason_no_complaint=encrypt_data(PUBLIC_KEY, reason_no_complaint),
+            solution_offered=encrypt_data(PUBLIC_KEY, solution_offered),
+            stayed_in_shelter=encrypt_data(PUBLIC_KEY, stayed_in_shelter),
+            last_shelter=encrypt_data(PUBLIC_KEY, last_shelter)
+             )
     
             # Add the records for related tables
             session.add(new_education)
