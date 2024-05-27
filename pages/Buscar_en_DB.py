@@ -9,7 +9,7 @@ from back.model import SessionLocal, General, Transit, Health, Education
 from sqlalchemy.orm import joinedload
 import pandas as pd
 # our decrypt data function
-from back.encrypt import decrypt_data
+from back.encrypt import decrypt_data, decrypt_large_data
 
 st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
 
@@ -57,56 +57,59 @@ def admin_decrypt_page(private_key):
                 'emergency_contact': decrypt_data(private_key, migrant.emergency_contact),
                 'emergency_contact_location': decrypt_data(private_key, migrant.emergency_contact_location),
                 'final_observations': decrypt_data(private_key, migrant.final_observations),
+                'front_photo': decrypt_large_data(private_key, migrant.front_photo) if migrant.front_photo else None,
+                'right_profile_photo': decrypt_large_data(private_key, migrant.right_profile_photo) if migrant.right_profile_photo else None,
+                'left_profile_photo': decrypt_large_data(private_key, migrant.left_profile_photo) if migrant.left_profile_photo else None,
                 'transit': {
-                    'date_left_origin': getattr(transit, 'date_left_origin', None),
-                    'traveling_alone_accompanied': getattr(transit, 'traveling_alone_accompanied', None),
-                    'who_accompanied': getattr(transit, 'who_accompanied', None),
-                    'which_relative': getattr(transit, 'which_relative', None),
-                    'how_traveled': getattr(transit, 'how_traveled', None),
-                    'reason_for_leaving': getattr(transit, 'reason_for_leaving', None),
-                    'abuse_during_travel': getattr(transit, 'abuse_during_travel', None),
-                    'type_of_abuse': getattr(transit, 'type_of_abuse', None),
-                    'abuse_in_mexico': getattr(transit, 'abuse_in_mexico', None),
-                    'type_of_abuse_mexico': getattr(transit, 'type_of_abuse_mexico', None),
-                    'abuser': getattr(transit, 'abuser', None),
-                    'paid_guide': getattr(transit, 'paid_guide', None),
-                    'amount_paid': getattr(transit, 'amount_paid', None),
-                    'date_entered_mexico': getattr(transit, 'date_entered_mexico', None),
-                    'entry_point_mexico': getattr(transit, 'entry_point_mexico', None),
-                    'final_destination': getattr(transit, 'final_destination', None),
-                    'destination_monterrey': getattr(transit, 'destination_monterrey', None),
-                    'reason_stay_monterrey': getattr(transit, 'reason_stay_monterrey', None),
-                    'support_network_monterrey': getattr(transit, 'support_network_monterrey', None),
-                    'time_knowing_support': getattr(transit, 'time_knowing_support', None),
-                    'tried_enter_us': getattr(transit, 'tried_enter_us', None),
-                    'support_network_us': getattr(transit, 'support_network_us', None),
-                    'description_support_us': getattr(transit, 'description_support_us', None),
-                    'been_in_migration_station': getattr(transit, 'been_in_migration_station', None),
-                    'suffered_aggression': getattr(transit, 'suffered_aggression', None),
-                    'migration_station_location': getattr(transit, 'migration_station_location', None),
-                    'description_of_facts': getattr(transit, 'description_of_facts', None),
-                    'filed_complaint': getattr(transit, 'filed_complaint', None),
-                    'reason_no_complaint': getattr(transit, 'reason_no_complaint', None),
-                    'solution_offered': getattr(transit, 'solution_offered', None),
-                    'stayed_in_shelter': getattr(transit, 'stayed_in_shelter', None),
-                    'last_shelter': getattr(transit, 'last_shelter', None),
+                    'date_left_origin': decrypt_data(private_key, transit.date_left_origin),
+                    'traveling_alone_accompanied': decrypt_data(private_key, transit.traveling_alone_accompanied),
+                    'who_accompanied': decrypt_data(private_key, transit.who_accompanied),
+                    'which_relative': decrypt_data(private_key, transit.which_relative),
+                    'how_traveled': decrypt_data(private_key, transit.how_traveled),
+                    'reason_for_leaving': decrypt_data(private_key, transit.reason_for_leaving),
+                    'abuse_during_travel': decrypt_data(private_key, transit.abuse_during_travel),
+                    'type_of_abuse': decrypt_data(private_key, transit.type_of_abuse),
+                    'abuse_in_mexico': decrypt_data(private_key, transit.abuse_in_mexico),
+                    'type_of_abuse_mexico': decrypt_data(private_key, transit.type_of_abuse_mexico),
+                    'abuser': decrypt_data(private_key, transit.abuser),
+                    'paid_guide': decrypt_data(private_key, transit.paid_guide),
+                    'amount_paid': decrypt_data(private_key, transit.amount_paid),
+                    'date_entered_mexico': decrypt_data(private_key, transit.date_entered_mexico),
+                    'entry_point_mexico': decrypt_data(private_key, transit.entry_point_mexico),
+                    'final_destination': decrypt_data(private_key, transit.final_destination),
+                    'destination_monterrey': decrypt_data(private_key, transit.destination_monterrey),
+                    'reason_stay_monterrey': decrypt_data(private_key, transit.reason_stay_monterrey),
+                    'support_network_monterrey': decrypt_data(private_key, transit.support_network_monterrey),
+                    'time_knowing_support': decrypt_data(private_key, transit.time_knowing_support),
+                    'tried_enter_us': decrypt_data(private_key, transit.tried_enter_us),
+                    'support_network_us': decrypt_data(private_key, transit.support_network_us),
+                    'description_support_us': decrypt_data(private_key, transit.description_support_us),
+                    'been_in_migration_station': decrypt_data(private_key, transit.been_in_migration_station),
+                    'suffered_aggression': decrypt_data(private_key, transit.suffered_aggression),
+                    'migration_station_location': decrypt_data(private_key, transit.migration_station_location),
+                    'description_of_facts': decrypt_data(private_key, transit.description_of_facts),
+                    'filed_complaint': decrypt_data(private_key, transit.filed_complaint),
+                    'reason_no_complaint': decrypt_data(private_key, transit.reason_no_complaint),
+                    'solution_offered': decrypt_data(private_key, transit.solution_offered),
+                    'stayed_in_shelter': decrypt_data(private_key, transit.stayed_in_shelter),
+                    'last_shelter': decrypt_data(private_key, transit.last_shelter),
                 },
                 'health': {
-                    'has_illness': getattr(health, 'has_illness', None),
-                    'illness_details': getattr(health, 'illness_details', None),
-                    'on_medical_treatment': getattr(health, 'on_medical_treatment', None),
-                    'medical_treatment_description': getattr(health, 'medical_treatment_description', None),
-                    'has_allergy': getattr(health, 'has_allergy', None),
-                    'allergy_details': getattr(health, 'allergy_details', None),
-                    'is_pregnant': getattr(health, 'is_pregnant', None),
-                    'months_pregnant': getattr(health, 'months_pregnant', None),
-                    'has_prenatal_care': getattr(health, 'has_prenatal_care', None),
+                    'has_illness': decrypt_data(private_key, health.has_illness),
+                    'illness_details': decrypt_data(private_key, health.illness_details),
+                    'on_medical_treatment': decrypt_data(private_key, health.on_medical_treatment),
+                    'medical_treatment_description': decrypt_data(private_key, health.medical_treatment_description),
+                    'has_allergy': decrypt_data(private_key, health.has_allergy),
+                    'allergy_details': decrypt_data(private_key, health.allergy_details),
+                    'is_pregnant': decrypt_data(private_key, health.is_pregnant),
+                    'months_pregnant': decrypt_data(private_key, health.months_pregnant),
+                    'has_prenatal_care': decrypt_data(private_key, health.has_prenatal_care),
                 },
                 'education': {
-                    'can_read_write': getattr(education, 'can_read_write', None),
-                    'last_grade_study': getattr(education, 'last_grade_study', None),
-                    'languages_spoken': getattr(education, 'languages_spoken', None),
-                    'other_language': getattr(education, 'other_language', None),
+                    'can_read_write': decrypt_data(private_key, education.can_read_write),
+                    'last_grade_study': decrypt_data(private_key, education.last_grade_study),
+                    'languages_spoken': decrypt_data(private_key, education.languages_spoken),
+                    'other_language': decrypt_data(private_key, education.other_language),
                 }
             }
             data.append(decrypted_migrant)
@@ -195,15 +198,24 @@ if __name__ == "__main__":
                     selected_id = ids_for_name[0]
 
                 if selected_id != 'Seleccione':
+                    
                     data_type = st.selectbox('Seleccione el tipo de dato', ['Seleccione', 'General', 'Health', 'Transit', 'Education'])
 
                     if data_type != 'Seleccione':
                         # Filtrar el DataFrame según el nombre y el ID seleccionados
                         df_migrant = df[(df['full_name'] == selected_migrant) & (df['id'] == selected_id)]
+                        # Mostrar las imagenes del migrante
+                        st.image(base64.b64decode(df_migrant['front_photo'].values[0]), caption='Foto de frente')
+                        st.image(base64.b64decode(df_migrant['right_profile_photo'].values[0]), caption='Foto de perfil derecho')
+                        st.image(base64.b64decode(df_migrant['left_profile_photo'].values[0]), caption='Foto de perfil izquierdo')
 
                         if data_type == 'General':
                             columnas = [col for col in df_migrant.columns if not any(prefix in col for prefix in ['transit', 'health', 'education'])]
                             columnas.remove('full_name')
+                            columnas.remove('front_photo')
+                            columnas.remove('right_profile_photo')
+                            columnas.remove('left_profile_photo')
+
                         elif data_type == 'Health':
                             columnas = [col for col in df_migrant.columns if 'health' in col]
                         elif data_type == 'Transit':
