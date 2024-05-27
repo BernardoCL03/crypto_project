@@ -97,6 +97,42 @@ def decrypt_data(private_key, encrypted_data):
     )
     return original_data.decode('utf-8')
 
+'''
+Estas dos funciones se usarán para encriptar y desencriptar las imagenes
+ya que, estos son strings muy largos y RSA no soporta strings tan largos
+por lo que los dividimos por chunks y encriptamos cada chunk por separado
+para al final unirlos, de igual manera para desencriptar lo hacemos por chunk.
+'''
+
+def encrypt_large_data(public_key, data, chunk_size=190):
+    encrypted_chunks = []
+    for i in range(0, len(data), chunk_size):
+        chunk = data[i:i+chunk_size]
+        encrypted_chunk = public_key.encrypt(
+            chunk,
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+        encrypted_chunks.append(base64.b64encode(encrypted_chunk).decode('utf-8'))
+    return encrypted_chunks
+
+def decrypt_large_data(private_key, encrypted_chunks):
+    decrypted_data = b""
+    for chunk in encrypted_chunks.split(','):
+        decrypted_chunk = private_key.decrypt(
+            base64.b64decode(chunk),
+            padding.OAEP(
+                mgf=padding.MGF1(algorithm=hashes.SHA256()),
+                algorithm=hashes.SHA256(),
+                label=None
+            )
+        )
+        decrypted_data += decrypted_chunk
+    return decrypted_data
+
 """
 -> PROCESO CARGAR PP KEYS Y ENCRIPTAR Y DESENCRIPTAR DATOS
 
