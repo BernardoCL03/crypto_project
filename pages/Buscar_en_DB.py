@@ -18,13 +18,14 @@ if st.session_state.get('authenticated'):
     if st.sidebar.button("Cerrar sesión"):
         # Al hacer clic en cerrar sesión, cambiamos el estado a no autenticado
         st.session_state.authenticated = False
+        st.rerun()
 
 
 # Iniciamos la página
 if __name__ == "__main__":
     st.title(':exclamation: Admin Decryption :exclamation:')
 
-    if st.session_state.get('authenticated') and st.session_state['user_type'] == 'Admin':
+    if st.session_state.get('authenticated') and st.session_state['user_type'] == 'Admin' or st.session_state['user_type'] == 'Colaborador':
 
         if 'otp_verified' not in st. session_state:
             st.session_state['otp_verified'] = False
@@ -32,7 +33,7 @@ if __name__ == "__main__":
         if not st.session_state['otp_verified']:
 
             st.markdown("""
-                #### Bienvenido a la sección de administración. Esta página está diseñada exclusivamente para el acceso y la gestión por parte de administradores autorizados.
+                #### Bienvenido a la sección de búsqueda de migrantes. Esta página está diseñada exclusivamente para el acceso y la gestión por parte de administradores y colaboradores autorizados.
 
                 ## Información Sensible
 
@@ -44,7 +45,7 @@ if __name__ == "__main__":
 
                 ### Responsabilidad
 
-                Como administrador, tiene la responsabilidad de:
+                Usted tiene la responsabilidad de:
                 - **Proteger la confidencialidad y la integridad de la información.**
                 - **Asegurar que el acceso a los datos se realice de forma segura y solo cuando sea estrictamente necesario.**
 

@@ -11,6 +11,7 @@ if st.session_state.get('authenticated'):
     if st.sidebar.button("Cerrar sesión"):
         # Al hacer clic en cerrar sesión, cambiamos el estado a no autenticado
         st.session_state.authenticated = False
+        st.rerun()
 
 st.title('Página de creación de usuarios :bust_in_silhouette: :white_check_mark:')
 
@@ -39,17 +40,17 @@ if st.session_state.get('authenticated'): # authenticated es True si el usuario 
 
             username = st.text_input("Nombre de usuario")
             password = st.text_input("Contraseña", type="password")
-            privileges = st.radio("Privilegios", options=['User', 'Admin'])
+            privileges = st.radio("Privilegios", options=['User', 'Colaborador', 'Admin'])
 
         # Contraseña de mínimo 8 de longitus, con mayúscula y un signo
         def validate_password(password):
-                if len(password) < 8:
-                    return "La contraseña debe tener al menos 8 caracteres."
-                if not re.search(r"[A-Z]", password):
-                    return "La contraseña debe tener al menos una letra mayúscula."
-                if not re.search(r"\W", password):
-                    return "La contraseña debe tener al menos un símbolo."
-                return None
+            if len(password) < 8:
+                return "La contraseña debe tener al menos 8 caracteres."
+            if not re.search(r"[A-Z]", password):
+                return "La contraseña debe tener al menos una letra mayúscula."
+            if not re.search(r"\W", password):
+                return "La contraseña debe tener al menos un símbolo."
+            return None
 
         def validate_username(username):
             if not re.match(r"^[a-zA-Z0-9._]+$", username):
@@ -86,8 +87,8 @@ if st.session_state.get('authenticated'): # authenticated es True si el usuario 
                     session.rollback()  # Rollback en caso de error de integridad
                 finally:
                     session.close()
-
-    if st.session_state['user_type'] == 'User':
+    
+    elif st.session_state['user_type'] == 'User' or st.session_state['user_type'] == 'Colaborador':
         st.error(f"¡Lo sentimos {st.session_state['username']}! Solamente usuarios con permisos de Admin tienen derecho a utilizar esta página.")
 else:
     st.error("Favor de iniciar sesión para acceder a esta página.")

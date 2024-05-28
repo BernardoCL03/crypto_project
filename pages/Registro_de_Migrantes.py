@@ -267,7 +267,7 @@ if __name__ == "__main__":
     today = datetime.today()
     min_date = today - timedelta(days=365.25 * 100)
     if st.session_state.get('authenticated'):
-        if st.session_state['user_type'] == 'Admin' or st.session_state['user_type'] == 'User':
+        if st.session_state['user_type'] == 'Admin' or st.session_state['user_type'] == 'Colaborador' or st.session_state['user_type'] == 'User':
             # cargamos .env
             dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
             load_dotenv(dotenv_path=dotenv_path)
