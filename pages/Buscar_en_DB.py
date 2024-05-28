@@ -2,13 +2,18 @@ import os
 import streamlit as st
 import base64
 import pyotp
+import time
 from dotenv import load_dotenv
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
+from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from back.encrypt import decrypt_data
 from sqlalchemy.orm import joinedload
 import pandas as pd
+import datetime
+from datetime import datetime, date
 # our decrypt data function
-from back.encrypt import decrypt_data, decrypt_large_data, admin_decrypt_page
+from back.model import SessionLocal, General # table names
+from back.encrypt import decrypt_data, decrypt_large_data, admin_decrypt_page, encrypt_data
 
 st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
 
@@ -86,28 +91,43 @@ if __name__ == "__main__":
             df = df[['full_name'] + [col for col in df.columns if col != 'full_name']]
             df.drop(['name','last_name'], axis = 1, inplace=True)
             # Agregar un menú para seleccionar el formato de búsqueda
+            # Filtrar los migrantes según el estado actual o pasado
             if 'consult' not in st.session_state:
-                search_type = st.selectbox('Seleccione el método de búsqueda', ['Seleccione', 'Nombre completo', 'Fecha de registro'])
+                migrant_type = st.selectbox('Seleccione el tipo de migrantes', ['Actuales', 'Pasados'])
+                st.session_state['migrant_type'] = migrant_type  # Guarda el tipo de migrante seleccionado
+                
+                if migrant_type == 'Actuales':
+                    df_filtered = df[df['current_member'] == 'si']
+                    search_type = st.selectbox('Seleccione el método de búsqueda', ['Seleccione', 'Nombre completo', 'Fecha de registro'])
+                else:
+                    df_filtered = df[df['current_member'] == 'no']
+                    search_type = st.selectbox('Seleccione el método de búsqueda', ['Seleccione', 'Nombre completo', 'Fecha de salida'])
+
                 selected_migrant = None
                 selected_id = None
 
                 if search_type == 'Nombre completo':
-                    all_names = df['full_name'].unique()
+                    all_names = df_filtered['full_name'].unique()
                     selected_migrant = st.selectbox('Seleccione un nombre', ['Seleccione'] + list(all_names))
                     if selected_migrant != 'Seleccione':
-                        ids_for_name = df[df['full_name'] == selected_migrant]['id'].unique()
+                        ids_for_name = df_filtered[df_filtered['full_name'] == selected_migrant]['id'].unique()
                         if len(ids_for_name) > 1:
                             st.write(f"Parece que hay múltiples registros bajo el nombre {selected_migrant}")
                             selected_id = st.selectbox('Seleccione el ID', ['Seleccione'] + list(ids_for_name))
                         else:
                             selected_id = ids_for_name[0]
 
-
-                elif search_type == 'Fecha de registro':
-                    unique_dates = df['arrival_date'].unique()
+                elif search_type in ['Fecha de registro', 'Fecha de salida']:
+                    if migrant_type == 'Actuales':
+                        unique_dates = df_filtered['arrival_date'].unique()
+                    else:
+                        unique_dates = df_filtered['date_departure'].unique()
                     selected_date = st.selectbox('Seleccione una fecha', ['Seleccione'] + list(unique_dates))
                     if selected_date != 'Seleccione':
-                        filtered_df = df[df['arrival_date'] == selected_date]
+                        if migrant_type == 'Actuales':
+                            filtered_df = df_filtered[df_filtered['arrival_date'] == selected_date]
+                        else:
+                            filtered_df = df_filtered[df_filtered['date_departure'] == selected_date]
                         selected_name = st.selectbox('Seleccione un nombre', ['Seleccione'] + filtered_df['full_name'].tolist())
                         if selected_name != 'Seleccione':
                             selected_id = filtered_df[filtered_df['full_name'] == selected_name]['id'].values[0]
@@ -117,11 +137,12 @@ if __name__ == "__main__":
                     st.session_state['selected_migrant'] = selected_migrant
                     st.session_state['selected_id'] = selected_id
                     st.session_state['consult'] = True
-                    st.rerun()
+                    st.experimental_rerun()
 
             if st.session_state.get('consult'):
                 selected_id = st.session_state['selected_id']
                 selected_migrant = st.session_state['selected_migrant']
+                migrant_type = st.session_state['migrant_type']  # Recupera el tipo de migrante seleccionado
                 st.info(f'Consulta de información sobre {selected_migrant}')
                 df_migrant = df[(df['full_name'] == selected_migrant) & (df['id'] == selected_id)]
                 st.image(base64.b64decode(df_migrant['front_photo'].values[0]), caption='Foto de frente')
@@ -153,7 +174,43 @@ if __name__ == "__main__":
                     del st.session_state['selected_migrant']
                     del st.session_state['selected_id']
                     del st.session_state['consult']
-                    st.rerun()
+                    del st.session_state['migrant_type']  # Elimina el tipo de migrante seleccionado
+                    st.experimental_rerun()
+
+                if migrant_type == 'Actuales':
+                    with st.form(key='dar_de_baja_form'):
+                        st.write('Dar de baja:')
+                        reason_departure = st.text_input('Razón de baja')
+                        today = datetime.today().date()
+                        arrival_date = df_migrant['arrival_date'].values[0]
+                        date_departure = st.date_input('Fecha de salida', min_value=arrival_date, max_value=today)
+                        confirmar_baja = st.form_submit_button('Confirmar baja')
+                        if confirmar_baja:
+                            if reason_departure:
+                                public_key_base64 = os.getenv('PUBLIC_KEY')
+                                public_key_pem = base64.b64decode(public_key_base64)
+                                PUBLIC_KEY = load_pem_public_key(public_key_pem)
+
+                                with SessionLocal() as session:
+                                    migrant = session.query(General).filter(General.id == int(selected_id)).first()
+                                    if migrant:
+                                        migrant.current_member = encrypt_data(PUBLIC_KEY, 'no')
+                                        migrant.reason_departure = encrypt_data(PUBLIC_KEY, reason_departure)
+                                        migrant.date_departure = encrypt_data(PUBLIC_KEY, date_departure.strftime('%Y-%m-%d'))
+                                        session.commit()
+                                    st.success('Migrante dado de baja exitosamente.')
+                                    del st.session_state['selected_migrant']
+                                    del st.session_state['selected_id']
+                                    del st.session_state['consult']
+                                    del st.session_state['migrant_type']  # Elimina el tipo de migrante seleccionado
+                                    time.sleep(1)
+                                    st.experimental_rerun()
+                            else:
+                                st.error('Por favor, proporciona una razón de baja.')
+
+
+
+
 
     
     elif st.session_state.get('authenticated') and st.session_state['user_type'] == 'User':
