@@ -117,7 +117,7 @@ if __name__ == "__main__":
                     st.session_state['selected_migrant'] = selected_migrant
                     st.session_state['selected_id'] = selected_id
                     st.session_state['consult'] = True
-                    st.experimental_rerun()
+                    st.rerun()
 
             if st.session_state.get('consult'):
                 selected_id = st.session_state['selected_id']
@@ -153,7 +153,7 @@ if __name__ == "__main__":
                     del st.session_state['selected_migrant']
                     del st.session_state['selected_id']
                     del st.session_state['consult']
-                    st.experimental_rerun()
+                    st.rerun()
 
     
     elif st.session_state.get('authenticated') and st.session_state['user_type'] == 'User':
