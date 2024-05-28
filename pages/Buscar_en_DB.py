@@ -122,7 +122,7 @@ if __name__ == "__main__":
             if st.session_state.get('consult'):
                 selected_id = st.session_state['selected_id']
                 selected_migrant = st.session_state['selected_migrant']
-                st.write(f'Consulta de información sobre {selected_migrant}')
+                st.info(f'Consulta de información sobre {selected_migrant}')
                 df_migrant = df[(df['full_name'] == selected_migrant) & (df['id'] == selected_id)]
                 st.image(base64.b64decode(df_migrant['front_photo'].values[0]), caption='Foto de frente')
                 data_type = st.selectbox('Seleccione el tipo de dato', ['Seleccione', 'General', 'Health', 'Transit', 'Education'])

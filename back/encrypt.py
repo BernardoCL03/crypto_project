@@ -5,6 +5,7 @@ from cryptography.hazmat.primitives.serialization import load_pem_private_key, l
 from back.model import SessionLocal, General, Transit, Health, Education
 from dotenv import load_dotenv
 import base64
+import pandas as pd
 import pyotp
 
 
@@ -114,12 +115,12 @@ def admin_decrypt_page(private_key):
             
             decrypted_migrant = {
                 'id': migrant.id,
-                'arrival_date': decrypt_data(private_key, migrant.arrival_date),
+                'arrival_date': pd.to_datetime(decrypt_data(private_key, migrant.arrival_date)).date(),
                 'type': decrypt_data(private_key, migrant.type),
                 'name': decrypt_data(private_key, migrant.name),
                 'last_name': decrypt_data(private_key, migrant.last_name),
                 'gender': decrypt_data(private_key, migrant.gender),
-                'birth_date': decrypt_data(private_key, migrant.birth_date),
+                'birth_date': pd.to_datetime(decrypt_data(private_key, migrant.birth_date)).date(),
                 'age': decrypt_data(private_key, migrant.age),
                 'country_of_origin': decrypt_data(private_key, migrant.country_of_origin),
                 'civil_status': decrypt_data(private_key, migrant.civil_status),
@@ -138,8 +139,11 @@ def admin_decrypt_page(private_key):
                 'front_photo': decrypt_large_data(private_key, migrant.front_photo) if migrant.front_photo else None,
                 'right_profile_photo': decrypt_large_data(private_key, migrant.right_profile_photo) if migrant.right_profile_photo else None,
                 'left_profile_photo': decrypt_large_data(private_key, migrant.left_profile_photo) if migrant.left_profile_photo else None,
+                'current_member': decrypt_data(private_key, migrant.current_member),
+                'reason_departure': decrypt_data(private_key, migrant.reason_departure),
+                'date_departure':decrypt_data(private_key, migrant.date_departure),
                 'transit': {
-                    'date_left_origin': decrypt_data(private_key, transit.date_left_origin),
+                    'date_left_origin': pd.to_datetime(decrypt_data(private_key, transit.date_left_origin)).date(),
                     'traveling_alone_accompanied': decrypt_data(private_key, transit.traveling_alone_accompanied),
                     'who_accompanied': decrypt_data(private_key, transit.who_accompanied),
                     'which_relative': decrypt_data(private_key, transit.which_relative),
@@ -152,7 +156,7 @@ def admin_decrypt_page(private_key):
                     'abuser': decrypt_data(private_key, transit.abuser),
                     'paid_guide': decrypt_data(private_key, transit.paid_guide),
                     'amount_paid': decrypt_data(private_key, transit.amount_paid),
-                    'date_entered_mexico': decrypt_data(private_key, transit.date_entered_mexico),
+                    'date_entered_mexico': pd.to_datetime(decrypt_data(private_key, transit.date_entered_mexico)).date(),
                     'entry_point_mexico': decrypt_data(private_key, transit.entry_point_mexico),
                     'final_destination': decrypt_data(private_key, transit.final_destination),
                     'destination_monterrey': decrypt_data(private_key, transit.destination_monterrey),

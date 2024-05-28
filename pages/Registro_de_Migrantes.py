@@ -187,7 +187,10 @@ def input_page():
                 final_observations=encrypt_data(PUBLIC_KEY, final_observations),
                 front_photo = ",".join(encrypted_front_photo),
                 right_profile_photo=",".join(encrypted_right_profile_photo),
-                left_profile_photo=",".join(encrypted_left_profile_photo)
+                left_profile_photo=",".join(encrypted_left_profile_photo),
+                current_member=encrypt_data(PUBLIC_KEY, 'si'),
+                reason_departure=encrypt_data(PUBLIC_KEY, 'NA'),
+                date_departure=encrypt_data(PUBLIC_KEY, 'NA')
             )
             session.add(new_general)
             session.commit()  # Commit to get the ID

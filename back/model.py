@@ -73,6 +73,9 @@ try:
         front_photo = Column(String, nullable=True)
         right_profile_photo = Column(String, nullable=True)
         left_profile_photo = Column(String, nullable=True)
+        current_member = Column(String, nullable=True)
+        reason_departure = Column(String, nullable=True)
+        date_departure = Column(String, nullable=True)
 
     class Transit(Base):
         __tablename__ = 'transit'
