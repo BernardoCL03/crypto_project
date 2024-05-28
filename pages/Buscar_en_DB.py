@@ -137,7 +137,7 @@ if __name__ == "__main__":
                     st.session_state['selected_migrant'] = selected_migrant
                     st.session_state['selected_id'] = selected_id
                     st.session_state['consult'] = True
-                    st.experimental_rerun()
+                    st.rerun()
 
             if st.session_state.get('consult'):
                 selected_id = st.session_state['selected_id']
@@ -175,7 +175,7 @@ if __name__ == "__main__":
                     del st.session_state['selected_id']
                     del st.session_state['consult']
                     del st.session_state['migrant_type']  # Elimina el tipo de migrante seleccionado
-                    st.experimental_rerun()
+                    st.rerun()
 
                 if migrant_type == 'Actuales':
                     with st.form(key='dar_de_baja_form'):
@@ -204,7 +204,7 @@ if __name__ == "__main__":
                                     del st.session_state['consult']
                                     del st.session_state['migrant_type']  # Elimina el tipo de migrante seleccionado
                                     time.sleep(1)
-                                    st.experimental_rerun()
+                                    st.rerun()
                             else:
                                 st.error('Por favor, proporciona una razón de baja.')
 
