@@ -11,6 +11,7 @@ if st.session_state.get('authenticated'):
     if st.sidebar.button("Cerrar sesión"):
         # Al hacer clic en cerrar sesión, cambiamos el estado a no autenticado
         st.session_state.authenticated = False
+        st.rerun()
 
 def menu_principal(username):
     st.markdown("""
@@ -22,11 +23,11 @@ def menu_principal(username):
 
             ### 1. **Registro de Migrantes**
             - **Descripción**: Esta pestaña permite la captura de información detallada de los migrantes.
-            - **Acceso**: Usuarios y administradores.
+            - **Acceso**: Usuarios, colaboradores y administradores.
 
             ### 2. **Buscar en DB**
             - **Descripción**: Funcionalidad exclusiva para administradores que permite realizar consultas específicas dentro de la base de datos para acceder a la información registrada de los migrantes.
-            - **Acceso**: Administradores.
+            - **Acceso**: Colaboradores y administradores.
 
             ### 3. **Creación de Usuarios**
             - **Descripción**: Esta sección está reservada para los administradores, quienes pueden crear nuevos usuarios asignando credenciales de acceso como administrador o usuario normal.
@@ -38,7 +39,7 @@ def menu_principal(username):
                 
             ### 5. **Visualizar datos**
             - **Descripción**: Permite a usuarios y administradores la posibilidad de ver gráficas interactivas y atractivas.
-            - **Acceso**: Usuarios y administradores.
+            - **Acceso**: Colaboradores y administradores.
 
             ## Nota Importante
             Este sistema maneja información sensible. Es crucial mantener la confidencialidad y la seguridad de los datos en todo momento. Cada usuario debe adherirse a las normas de seguridad establecidas para garantizar la protección de la información.

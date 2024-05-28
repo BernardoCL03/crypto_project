@@ -139,7 +139,7 @@ try:
         id = Column(Integer, primary_key=True, autoincrement=True)
         username = Column(String(50), unique=True, nullable=False)
         password_hash = Column(String, nullable=False)
-        user_type = Column(Enum('User','Admin', name = 'user_types'), default='User', nullable=False)
+        user_type = Column(Enum('User', 'Colaborador', 'Admin', name = 'user_types'), default='User', nullable=False)
 
         def set_password(self, password):
             self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
