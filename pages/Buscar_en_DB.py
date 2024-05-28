@@ -182,56 +182,76 @@ if __name__ == "__main__":
             df['full_name'] = df['name'] + ' ' + df['last_name']
             df = df[['full_name'] + [col for col in df.columns if col != 'full_name']]
             df.drop(['name','last_name'], axis = 1, inplace=True)
-            all_names = df['full_name'].unique()
-            # Crear un menú desplegable con los nombres
-        
-            # Crear un menú desplegable con los nombres
-            selected_migrant = st.selectbox('Seleccione un nombre', ['Seleccione'] + list(all_names))
+            # Agregar un menú para seleccionar el formato de búsqueda
+            if 'consult' not in st.session_state:
+                search_type = st.selectbox('Seleccione el método de búsqueda', ['Seleccione', 'Nombre completo', 'Fecha de registro'])
+                selected_migrant = None
+                selected_id = None
 
-            if selected_migrant != 'Seleccione':
-                # Filtrar los IDs correspondientes al nombre seleccionado
-                ids_for_name = df[df['full_name'] == selected_migrant]['id'].unique()
-                if len(ids_for_name) > 1:
-                    st.write(f"Parece que hay múltiples registros bajo el nombre {selected_migrant}")
-                    selected_id = st.selectbox('Seleccione el ID', ['Seleccione'] + list(ids_for_name))
-                else:
-                    selected_id = ids_for_name[0]
+                if search_type == 'Nombre completo':
+                    all_names = df['full_name'].unique()
+                    selected_migrant = st.selectbox('Seleccione un nombre', ['Seleccione'] + list(all_names))
+                    if selected_migrant != 'Seleccione':
+                        ids_for_name = df[df['full_name'] == selected_migrant]['id'].unique()
+                        if len(ids_for_name) > 1:
+                            st.write(f"Parece que hay múltiples registros bajo el nombre {selected_migrant}")
+                            selected_id = st.selectbox('Seleccione el ID', ['Seleccione'] + list(ids_for_name))
+                        else:
+                            selected_id = ids_for_name[0]
 
-                if selected_id != 'Seleccione':
-                    
-                    data_type = st.selectbox('Seleccione el tipo de dato', ['Seleccione', 'General', 'Health', 'Transit', 'Education'])
 
-                    if data_type != 'Seleccione':
-                        # Filtrar el DataFrame según el nombre y el ID seleccionados
-                        df_migrant = df[(df['full_name'] == selected_migrant) & (df['id'] == selected_id)]
-                        # Mostrar las imagenes del migrante
-                        st.image(base64.b64decode(df_migrant['front_photo'].values[0]), caption='Foto de frente')
-                        st.image(base64.b64decode(df_migrant['right_profile_photo'].values[0]), caption='Foto de perfil derecho')
-                        st.image(base64.b64decode(df_migrant['left_profile_photo'].values[0]), caption='Foto de perfil izquierdo')
+                elif search_type == 'Fecha de registro':
+                    unique_dates = df['arrival_date'].unique()
+                    selected_date = st.selectbox('Seleccione una fecha', ['Seleccione'] + list(unique_dates))
+                    if selected_date != 'Seleccione':
+                        filtered_df = df[df['arrival_date'] == selected_date]
+                        selected_name = st.selectbox('Seleccione un nombre', ['Seleccione'] + filtered_df['full_name'].tolist())
+                        if selected_name != 'Seleccione':
+                            selected_id = filtered_df[filtered_df['full_name'] == selected_name]['id'].values[0]
+                            selected_migrant = selected_name
 
-                        if data_type == 'General':
-                            columnas = [col for col in df_migrant.columns if not any(prefix in col for prefix in ['transit', 'health', 'education'])]
-                            columnas.remove('full_name')
-                            columnas.remove('front_photo')
-                            columnas.remove('right_profile_photo')
-                            columnas.remove('left_profile_photo')
+                if selected_migrant and selected_id and st.button('Consultar información', key='consultar_info'):
+                    st.session_state['selected_migrant'] = selected_migrant
+                    st.session_state['selected_id'] = selected_id
+                    st.session_state['consult'] = True
+                    st.experimental_rerun()
 
-                        elif data_type == 'Health':
-                            columnas = [col for col in df_migrant.columns if 'health' in col]
-                        elif data_type == 'Transit':
-                            columnas = [col for col in df_migrant.columns if 'transit' in col]
-                        elif data_type == 'Education':
-                            columnas = [col for col in df_migrant.columns if 'education' in col]
+            if st.session_state.get('consult'):
+                selected_id = st.session_state['selected_id']
+                selected_migrant = st.session_state['selected_migrant']
+                st.write(f'Consulta de información sobre {selected_migrant}')
+                df_migrant = df[(df['full_name'] == selected_migrant) & (df['id'] == selected_id)]
+                st.image(base64.b64decode(df_migrant['front_photo'].values[0]), caption='Foto de frente')
+                data_type = st.selectbox('Seleccione el tipo de dato', ['Seleccione', 'General', 'Health', 'Transit', 'Education'])
 
-                        # Mostrar el DataFrame filtrado sin el índice
-                        df_seleccionado = df_migrant[columnas]
-                        # Transponer el DataFrame
-                        df_transpuesto = df_seleccionado.transpose()
+                if data_type != 'Seleccione':
+                    if data_type == 'General':
+                        columnas = [col for col in df_migrant.columns if not any(prefix in col for prefix in ['transit', 'health', 'education'])]
+                        columnas.remove('full_name')
+                        columnas.remove('front_photo')
+                        columnas.remove('right_profile_photo')
+                        columnas.remove('left_profile_photo')
+                    elif data_type == 'Health':
+                        columnas = [col for col in df_migrant.columns if 'health' in col]
+                    elif data_type == 'Transit':
+                        columnas = [col for col in df_migrant.columns if 'transit' in col]
+                    elif data_type == 'Education':
+                        columnas = [col for col in df_migrant.columns if 'education' in col]
 
-                        # Corregir los nombres de las columnas
-                        df_transpuesto.columns = [selected_migrant]
+                    df_seleccionado = df_migrant[columnas]
+                    df_transpuesto = df_seleccionado.transpose()
+                    df_transpuesto.columns = [selected_migrant]
+                    st.dataframe(df_transpuesto, width=1200, height=600)
 
-                        st.dataframe(df_transpuesto, width=1200, height=600)
+                    st.image(base64.b64decode(df_migrant['right_profile_photo'].values[0]), caption='Foto de perfil derecho')
+                    st.image(base64.b64decode(df_migrant['left_profile_photo'].values[0]), caption='Foto de perfil izquierdo')
+
+                if st.button('Finalizar consulta', key='finalizar_consulta'):
+                    del st.session_state['selected_migrant']
+                    del st.session_state['selected_id']
+                    del st.session_state['consult']
+                    st.experimental_rerun()
+
     
     elif st.session_state.get('authenticated') and st.session_state['user_type'] == 'User':
         st.error('No tienes permisos para acceder a esta página.')
