@@ -60,6 +60,8 @@ if st.session_state.get('authenticated'):
                 if column in variables:
                     dictFilters[column] = list(df[column].unique())
 
+            st.info('Filtros para dashboards')
+
             if 'filters' not in st.session_state:
                 st.session_state['filters'] = []
 
@@ -75,20 +77,47 @@ if st.session_state.get('authenticated'):
                         key=f'key_select_{i}'
                     )
                     if key:
-                        value = st.selectbox(
-                            'Seleccione el valor:',
-                            options=dictFilters[key],
-                            key=f'value_select_{i}'
-                        )
-                        # Update the dictionary for the current filter
-                        st.session_state['filters'][i] = {key: value}
+                        # Determine the type of data in the column
+                        if df[key].dtype == 'int64':
+                            st.info("INT DONE")
+                            # It's an integer, use a slider
+                            value_range = st.slider(
+                                "Seleccione el rango de valores:",
+                                min_value=int(df[key].min()),
+                                max_value=int(df[key].max()),
+                                value=(int(df[key].min()), int(df[key].max())),
+                                key=f'range_slider_{i}'
+                            )
+                            # Update the dictionary to filter between this range
+                            st.session_state['filters'][i] = {key: value_range}
+                        elif pd.api.types.is_datetime64_any_dtype(df[key]):
+                            # It's a datetime, use a date input
+                            date_range = st.date_input(
+                                "Seleccione el rango de fechas:",
+                                value=(df[key].min(), df[key].max()),
+                                key=f'date_range_{i}'
+                            )
+                            st.session_state['filters'][i] = {key: date_range}
+                        else:
+                            # It's categorical or other, use a selectbox
+                            value = st.selectbox(
+                                'Seleccione el valor:',
+                                options=pd.unique(df[key].dropna()),
+                                key=f'value_select_{i}'
+                            )
+                            st.session_state['filters'][i] = {key: value}
 
             # Apply filters to the dataframe
             if st.button("Aplicar filtros"):
                 df_filtered = df.copy()
                 for filter_dict in st.session_state['filters']:
                     for k, v in filter_dict.items():
-                        df_filtered = df_filtered[df_filtered[k] == v]
+                        if isinstance(v, tuple) and isinstance(v[0], int):
+                            df_filtered = df_filtered[(df_filtered[k] >= v[0]) & (df_filtered[k] <= v[1])]
+                        elif isinstance(v, tuple) and isinstance(v[0], pd.Timestamp):
+                            df_filtered = df_filtered[(df_filtered[k] >= v[0]) & (df_filtered[k] <= v[1])]
+                        else:
+                            df_filtered = df_filtered[df_filtered[k] == v]
                 # Display filtered dataframe
                 st.write(df_filtered)
 
