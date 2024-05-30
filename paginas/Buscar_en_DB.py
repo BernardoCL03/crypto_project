@@ -23,7 +23,7 @@ def buscar_en_db_page():
 
     if st.session_state.get('authenticated'): 
     
-        if st.session_state['user_type'] == 'Admin':
+        if st.session_state['user_type'] == 'Admin' or st.session_state['user_type'] == 'User':
 
             if 'otp_verified' not in st. session_state:
                 st.session_state['otp_verified'] = False
@@ -249,9 +249,9 @@ def buscar_en_db_page():
                                     st.error('Por favor, proporciona una razón de baja.')
 
         
-        elif st.session_state.get('authenticated') and st.session_state['user_type'] == 'User':
+        elif st.session_state.get('authenticated') and st.session_state['user_type'] == 'Colaborador':
             st.error('No tienes permisos para acceder a esta página.')
         
+        # en teoria este mensaje nunca sale
         else:
             st.error('Favor de iniciar sesión para acceder a esta página.')
-            

@@ -1,12 +1,14 @@
 import os
 import logging
+from datetime import datetime
 from sqlalchemy.exc import SQLAlchemyError
-from sqlalchemy import create_engine, Engine, Column, Integer, String, Date, Enum, ForeignKey
+from sqlalchemy import create_engine, Column, Integer, String, Enum, DateTime, ForeignKey
 from sqlalchemy.engine import URL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
-import bcrypt
+import bcrypt # pswd hashing
+import pytz # zonas horarias
 
 # para loggear
 logging.basicConfig(level=logging.INFO)
@@ -139,13 +141,22 @@ try:
         id = Column(Integer, primary_key=True, autoincrement=True)
         username = Column(String(50), unique=True, nullable=False)
         password_hash = Column(String, nullable=False)
-        user_type = Column(Enum('User','Admin', name = 'user_types'), default='User', nullable=False)
+        user_type = Column(Enum('User', 'Colaborador', 'Admin', name = 'user_types'), default='User', nullable=False)
 
         def set_password(self, password):
             self.password_hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
 
         def check_password(self, password):
             return bcrypt.checkpw(password.encode('utf-8'), self.password_hash)
+        
+    class Logs(Base):
+        __tablename__ = 'logs'
+        id = Column(Integer, primary_key=True, autoincrement=True)
+        timestamp = Column(DateTime, default=lambda: datetime.now(pytz.timezone('America/Monterrey')), nullable=False)
+        action = Column(String(20), nullable=False)
+        user_name = Column(String, ForeignKey('users.username'), nullable=False)
+        user_type = Column(String, ForeignKey('users.user_type'), nullable=False )
+        description = Column(String(100), nullable=True)
 
     # Crear todas las tablas en la base de datos
     Base.metadata.create_all(engine)
