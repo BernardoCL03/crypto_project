@@ -42,14 +42,13 @@ def input_page(PUBLIC_KEY, min_date, today):
         children_traveling = st.number_input("¿Cuántos hijos están viajando con usted?", min_value=0) if has_children == 'Si' else 0
         can_read_write = st.radio("Puede Leer y Escribir", options=['Sí', 'No'])
         last_grade_study = st.selectbox("Último Grado de Estudio", options=['Preescolar', 'Primaria', 'Secundaria', 'Bachillerato', 'Bachillerato Técnico', 'Universidad', 'No Escolarizado'])
-        # TODO: fix languages to appear in db
         languages_spoken = st.multiselect("Idiomas que Habla", options=['Inglés', 'Español', 'Francés', 'Criollo Haitiano', 'Garífuna', 'Otro'])
         other_language = st.text_input("Si habla otro idioma, especifique")
         if 'Otro' not in languages_spoken:
             other_language = 'NA'
         date_left_origin = st.date_input("Fecha en que Dejó el País de Origen", max_value=today, value=today)
         traveling_alone_accompanied = st.radio("Viajando Solo o Acompañado", options=['Solo', 'Acompañado'], index=1)
-        who_accompanied = st.radio("¿Por quién está siendo acompañado/a?", # TODO fix potential bug, algunas veces aparece, otras veces no...
+        who_accompanied = st.radio("¿Por quién está siendo acompañado/a?",
                                    options=[
                                        'Hijo/a', 'Pareja', 'Pareja e hijo/a', 'Mamá', 'Papá', 'Mamá y papá','Primo/a','Amigo/a',
                                        'Otro pariente']) if traveling_alone_accompanied == 'Acompañado' else 'NA'

@@ -4,8 +4,9 @@ import streamlit as st
 import base64
 from dotenv import load_dotenv
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
-from back.encrypt import decrypt_data
-from sqlalchemy.orm import joinedload
+import matplotlib.pyplot as plt
+import seaborn as sns
+import math
 import pandas as pd
 # our decrypt data function
 from back.encrypt import admin_decrypt_page
@@ -114,8 +115,50 @@ def visualizar_datos_page():
                             else:
                                 df_filtered = df_filtered[df_filtered[k] == v]
                     # Display filtered dataframe
-                    st.write(df_filtered)
+                    df = df_filtered
 
+                # After the line 'st.write(df_filtered)'
+                # Define the number of columns in the grid
+                num_columns = 3  # You can change this number based on your preference or screen size
+
+                # Create a list to hold the figures
+                figures = []
+
+                for variable in variables:
+                    if variable in df.columns:
+                        fig, ax = plt.subplots()
+                        if df[variable].dtype == 'int64':
+                            # Plotting for integer variables
+                            sns.histplot(df[variable].dropna(), kde=False, ax=ax)
+                            ax.set_title(f'Distribución de {variable}')
+                        elif isinstance(df[variable].iloc[0], datetime.date):
+                            # Plotting for date variables
+                            date_counts = df[variable].dropna().value_counts().sort_index()
+                            date_counts.plot(kind='line', ax=ax)
+                            ax.set_title(f'Serie de tiempo de {variable}')
+                            ax.set_xlabel('Fecha')
+                            ax.set_ylabel('Frecuencia')
+                        else:
+                            # Plotting for object variables
+                            value_counts = df[variable].value_counts()
+                            sns.barplot(x=value_counts.index, y=value_counts.values, ax=ax)
+                            ax.set_title(f'Frecuencia de {variable}')
+                            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, horizontalalignment='right')
+
+                        # Append the figure to the list
+                        figures.append(fig)
+
+                # Calculate the number of rows needed based on the number of columns
+                num_rows = math.ceil(len(figures) / num_columns)
+
+                # Display the figures in a grid
+                for i in range(num_rows):
+                    cols = st.columns(num_columns)  # Create a row of columns
+                    for j in range(num_columns):
+                        idx = i * num_columns + j
+                        if idx < len(figures):
+                            with cols[j]:
+                                st.pyplot(figures[idx])
 
 
 
