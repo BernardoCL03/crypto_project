@@ -17,7 +17,7 @@ st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
 def menu_principal(username, user_type):
     if user_type == 'Admin':
         st.markdown(f"""
-            # Bienvenidx {username}; al Sistema de Gestión de Migrantes de casa Monarca :butterfly: 
+            # ¡Bienvenido {username}, al Sistema de Gestión de Migrantes de casa Monarca :butterfly:! 
 
             Este portal web está diseñado para facilitar la administración y visualización de información de migrantes. Proporciona herramientas tanto para usuarios administradores como para usuarios normales, cada uno con niveles de acceso y capacidades distintas dentro del sistema.
 
@@ -27,7 +27,7 @@ def menu_principal(username, user_type):
             - **Descripción**: Esta pestaña permite la captura de información detallada de los migrantes.
 
             ### 2. **Buscar en DB**
-            - **Descripción**: Funcionalidad exclusiva para administradores que permite realizar consultas específicas dentro de la base de datos para acceder a la información registrada de los migrantes.
+            - **Descripción**: Permite realizar consultas específicas dentro de la base de datos para acceder a la información registrada de los migrantes.
 
             ### 3. **Creación de Usuarios**
             - **Descripción**: Esta sección está reservada para los administradores, quienes pueden crear nuevos usuarios asignando credenciales de acceso como administrador o usuario normal.
@@ -38,12 +38,15 @@ def menu_principal(username, user_type):
             ### 5. **Visualizar datos**
             - **Descripción**: Permite a usuarios y administradores la posibilidad de ver gráficas interactivas y atractivas.
 
+            ### 6. **Registro de logs**
+            - **Descripción**: Permite a administradores consultar registros de migrantes añadidos, dados de baja y cuando se realizan búsquedas en la base de datos.
+
             ## Nota Importante
             Este sistema maneja información sensible. Es crucial mantener la confidencialidad y la seguridad de los datos en todo momento. Cada usuario debe adherirse a las normas de seguridad establecidas para garantizar la protección de la información.
         """)
     elif user_type == 'User':
         st.markdown(f"""
-            # Bienvenido {username}; al Sistema de Gestión de Migrantes de casa Monarca :butterfly: 
+            # ¡Bienvenido {username}, al Sistema de Gestión de Migrantes de casa Monarca :butterfly:! 
 
             Este portal web está diseñado para facilitar la administración y visualización de información de migrantes. Proporciona herramientas para usuarios normales con el objetivo de capturar y visualizar información de manera eficiente y segura.
 
@@ -55,6 +58,22 @@ def menu_principal(username, user_type):
             ### 2. **Visualizar datos**
             - **Descripción**: Permite a usuarios y administradores la posibilidad de ver gráficas interactivas y atractivas.
 
+            ### 3. **Buscar en DB**
+            - **Descripción**: Permite realizar consultas específicas dentro de la base de datos para acceder a la información registrada de los migrantes.
+
+            ## Nota Importante
+            Este sistema maneja información sensible. Es crucial mantener la confidencialidad y la seguridad de los datos en todo momento. Cada usuario debe adherirse a las normas de seguridad establecidas para garantizar la protección de la información.
+        """)
+    elif user_type == 'Colaborador':
+        st.markdown(f"""
+            # ¡Bienvenido {username}, al Sistema de Gestión de Migrantes de casa Monarca :butterfly:! 
+
+            Este portal web está diseñado para facilitar la administración y visualización de información de migrantes. Proporciona herramientas para usuarios normales con el objetivo de capturar y visualizar información de manera eficiente y segura.
+
+            ## Páginas y Funcionalidades
+
+            ### 1. **Registro de Migrantes**
+            - **Descripción**: Esta pestaña permite la captura de información detallada de los migrantes.
 
             ## Nota Importante
             Este sistema maneja información sensible. Es crucial mantener la confidencialidad y la seguridad de los datos en todo momento. Cada usuario debe adherirse a las normas de seguridad establecidas para garantizar la protección de la información.
@@ -102,10 +121,12 @@ if not st.session_state['authenticated']:
     login()
 else:
     # Navegación entre páginas
-    if st.session_state['user_type'] != "Admin":
-        page =  st.sidebar.selectbox("Seleccionar página", ["Menú", "Registro de Migrantes","Visualizar datos"])
-    else:
+    if st.session_state['user_type'] == "Admin":
         page =  st.sidebar.selectbox("Seleccionar página", ["Menú", "Registro de Migrantes","Visualizar datos","Buscar en DB","Creacion de Usuarios","Ver Usuarios"])
+    elif st.session_state['user_type'] == 'User':
+        page =  st.sidebar.selectbox("Seleccionar página", ["Menú", "Registro de Migrantes","Visualizar datos", 'Buscar en DB'])
+    elif st.session_state['user_type'] == 'Colaborador':
+        page =  st.sidebar.selectbox("Seleccionar página", ["Menú", "Registro de Migrantes"])
 
 
     # Manejo de la barra lateral y la sesión
