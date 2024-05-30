@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
@@ -115,17 +117,17 @@ def admin_decrypt_page(private_key):
             
             decrypted_migrant = {
                 'id': migrant.id,
-                'arrival_date': pd.to_datetime(decrypt_data(private_key, migrant.arrival_date)).date(),
+                'arrival_date': datetime.strptime((decrypt_data(private_key, migrant.arrival_date)), "%Y-%m-%d").date(),
                 'type': decrypt_data(private_key, migrant.type),
                 'name': decrypt_data(private_key, migrant.name),
                 'last_name': decrypt_data(private_key, migrant.last_name),
                 'gender': decrypt_data(private_key, migrant.gender),
-                'birth_date': pd.to_datetime(decrypt_data(private_key, migrant.birth_date)).date(),
+                'birth_date': datetime.strptime((decrypt_data(private_key, migrant.birth_date)), "%Y-%m-%d").date(),
                 'age': int(decrypt_data(private_key, migrant.age)),
                 'country_of_origin': decrypt_data(private_key, migrant.country_of_origin),
                 'civil_status': decrypt_data(private_key, migrant.civil_status),
                 'has_children': decrypt_data(private_key, migrant.has_children),
-                'children_traveling': decrypt_data(private_key, migrant.children_traveling),
+                'children_traveling': int(decrypt_data(private_key, migrant.children_traveling)),
                 'can_return_to_country': decrypt_data(private_key, migrant.can_return_to_country),
                 'reason_cannot_return': decrypt_data(private_key, migrant.reason_cannot_return),
                 'access_to_casa_monarca': decrypt_data(private_key, migrant.access_to_casa_monarca),
@@ -141,9 +143,10 @@ def admin_decrypt_page(private_key):
                 'left_profile_photo': decrypt_large_data(private_key, migrant.left_profile_photo) if migrant.left_profile_photo else None,
                 'current_member': decrypt_data(private_key, migrant.current_member),
                 'reason_departure': decrypt_data(private_key, migrant.reason_departure),
-                'date_departure':decrypt_data(private_key, migrant.date_departure),
+                'date_departure': datetime.strptime(decrypt_data(private_key, migrant.date_departure), "%Y-%m-%d") if decrypt_data(private_key, migrant.date_departure) != 'NA' else datetime(9999, 12, 31)
+                ,
                 'transit': {
-                    'date_left_origin': pd.to_datetime(decrypt_data(private_key, transit.date_left_origin)).date(),
+                    'date_left_origin': datetime.strptime(decrypt_data(private_key, transit.date_left_origin), "%Y-%m-%d"),
                     'traveling_alone_accompanied': decrypt_data(private_key, transit.traveling_alone_accompanied),
                     'who_accompanied': decrypt_data(private_key, transit.who_accompanied),
                     'which_relative': decrypt_data(private_key, transit.which_relative),
@@ -156,7 +159,7 @@ def admin_decrypt_page(private_key):
                     'abuser': decrypt_data(private_key, transit.abuser),
                     'paid_guide': decrypt_data(private_key, transit.paid_guide),
                     'amount_paid': decrypt_data(private_key, transit.amount_paid),
-                    'date_entered_mexico': pd.to_datetime(decrypt_data(private_key, transit.date_entered_mexico)).date(),
+                    'date_entered_mexico': datetime.strptime(decrypt_data(private_key, transit.date_entered_mexico), "%Y-%m-%d"),
                     'entry_point_mexico': decrypt_data(private_key, transit.entry_point_mexico),
                     'final_destination': decrypt_data(private_key, transit.final_destination),
                     'destination_monterrey': decrypt_data(private_key, transit.destination_monterrey),

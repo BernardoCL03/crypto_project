@@ -1,11 +1,14 @@
+import datetime
 import os
 import streamlit as st
 import base64
 from dotenv import load_dotenv
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
-from back.encrypt import decrypt_data
-from sqlalchemy.orm import joinedload
+import matplotlib.pyplot as plt
+import seaborn as sns
+import math
 import pandas as pd
+
 # our decrypt data function
 from back.encrypt import admin_decrypt_page
 
@@ -55,8 +58,6 @@ def visualizar_datos_page():
                     if column in variables:
                         dictFilters[column] = list(df[column].unique())
 
-                st.info('Filtros para dashboards')
-
                 if 'filters' not in st.session_state:
                     st.session_state['filters'] = []
 
@@ -74,7 +75,6 @@ def visualizar_datos_page():
                         if key:
                             # Determine the type of data in the column
                             if df[key].dtype == 'int64':
-                                st.info("INT DONE")
                                 # It's an integer, use a slider
                                 value_range = st.slider(
                                     "Seleccione el rango de valores:",
@@ -85,12 +85,14 @@ def visualizar_datos_page():
                                 )
                                 # Update the dictionary to filter between this range
                                 st.session_state['filters'][i] = {key: value_range}
-                            elif pd.api.types.is_datetime64_any_dtype(df[key]):
+                            elif isinstance(df[key].iloc[0], datetime.date):
                                 # It's a datetime, use a date input
-                                date_range = st.date_input(
-                                    "Seleccione el rango de fechas:",
-                                    value=(df[key].min(), df[key].max()),
-                                    key=f'date_range_{i}'
+                                date_range = st.slider(
+                                    "Seleccione el rango de valores:",
+                                    min_value=(df[key].min()),
+                                    max_value=(df[key].max()),
+                                    value=((df[key].min()), (df[key].max())),
+                                    key=f'range_slider_{i}'
                                 )
                                 st.session_state['filters'][i] = {key: date_range}
                             else:
@@ -114,11 +116,60 @@ def visualizar_datos_page():
                             else:
                                 df_filtered = df_filtered[df_filtered[k] == v]
                     # Display filtered dataframe
-                    st.write(df_filtered)
+                    df = df_filtered
 
+                # After the line 'st.write(df_filtered)'
+                # Define the number of columns in the grid
+                num_columns = 3  # You can change this number based on your preference or screen size
+                print(plt.style.available)
+                plt.style.use('seaborn-v0_8-darkgrid')
+                plt.rcParams['axes.facecolor'] = 'none'  # Dark grey background for the axes
+                plt.rcParams['figure.facecolor'] = 'none'  # Darker grey background for the figure
+                plt.rcParams['axes.edgecolor'] = 'white'  # White edges to better delimit the plots
+                plt.rcParams['text.color'] = 'white'  # White text for better contrast
+                plt.rcParams['axes.labelcolor'] = 'white'
+                plt.rcParams['xtick.color'] = 'white'
+                plt.rcParams['ytick.color'] = 'white'
 
+                # Assume df is your DataFrame, also predefined
+                figures = []  # This will hold the figures to display later
 
+                for variable in variables:
+                    if variable in df.columns:
+                        fig, ax = plt.subplots(figsize=(10, 6))  # Larger figure size for better readability
+                        if df[variable].dtype == 'int64':
+                            # Plotting for integer variables with a nicer palette and edges
+                            sns.histplot(df[variable].dropna(), kde=True, color='skyblue', edgecolor='black', ax=ax)
+                            ax.set_title(f'Distribution of {variable}', fontsize=16)
+                        elif isinstance(df[variable].iloc[0], datetime.date):
+                            # Plotting for date variables with a line plot
+                            date_counts = df[variable].dropna().value_counts().sort_index()
+                            date_counts.plot(kind='line', color='green', ax=ax)
+                            ax.set_title(f'Time Series of {variable}', fontsize=16)
+                            ax.set_xlabel('Date', fontsize=12)
+                            ax.set_ylabel('Frequency', fontsize=12)
+                        else:
+                            # Plotting for object variables with better visual handling of categories
+                            value_counts = df[variable].value_counts()
+                            sns.barplot(x=value_counts.index, y=value_counts.values, palette='viridis', ax=ax)
+                            ax.set_title(f'Frequency of {variable}', fontsize=16)
+                            ax.set_xticklabels(ax.get_xticklabels(), rotation=45, horizontalalignment='right')
+                        ax.set_xlabel(ax.get_xlabel(), fontsize=12)
+                        ax.set_ylabel(ax.get_ylabel(), fontsize=12)
+                        ax.tick_params(labelsize=10)  # Smaller label size
+                        figures.append(fig)  # Append the figure to the list
 
+                # Assume you have a Streamlit setup with num_columns defined
+                num_rows = math.ceil(len(figures) / num_columns)  # Calculate the number of rows needed
+
+                # Display the figures in a grid
+                for i in range(num_rows):
+                    cols = st.columns(num_columns)  # Create a row of columns
+                    for j in range(num_columns):
+                        idx = i * num_columns + j
+                        if idx < len(figures):
+                            with cols[j]:
+                                st.pyplot(figures[idx])
 
 
     else:
