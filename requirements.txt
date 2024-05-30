@@ -11,3 +11,4 @@ pycountry==23.12.11
 cryptography==42.0.7
 pyotp==2.9.0
 qrcode==7.4.2
+reportlab

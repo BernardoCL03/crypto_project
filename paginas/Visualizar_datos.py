@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import math
 import pandas as pd
+
 # our decrypt data function
 from back.encrypt import admin_decrypt_page
 
@@ -120,36 +121,46 @@ def visualizar_datos_page():
                 # After the line 'st.write(df_filtered)'
                 # Define the number of columns in the grid
                 num_columns = 3  # You can change this number based on your preference or screen size
+                print(plt.style.available)
+                plt.style.use('seaborn-v0_8-darkgrid')
+                plt.rcParams['axes.facecolor'] = 'none'  # Dark grey background for the axes
+                plt.rcParams['figure.facecolor'] = 'none'  # Darker grey background for the figure
+                plt.rcParams['axes.edgecolor'] = 'white'  # White edges to better delimit the plots
+                plt.rcParams['text.color'] = 'white'  # White text for better contrast
+                plt.rcParams['axes.labelcolor'] = 'white'
+                plt.rcParams['xtick.color'] = 'white'
+                plt.rcParams['ytick.color'] = 'white'
 
-                # Create a list to hold the figures
-                figures = []
+                # Assume df is your DataFrame, also predefined
+                figures = []  # This will hold the figures to display later
 
                 for variable in variables:
                     if variable in df.columns:
-                        fig, ax = plt.subplots()
+                        fig, ax = plt.subplots(figsize=(10, 6))  # Larger figure size for better readability
                         if df[variable].dtype == 'int64':
-                            # Plotting for integer variables
-                            sns.histplot(df[variable].dropna(), kde=False, ax=ax)
-                            ax.set_title(f'Distribución de {variable}')
+                            # Plotting for integer variables with a nicer palette and edges
+                            sns.histplot(df[variable].dropna(), kde=True, color='skyblue', edgecolor='black', ax=ax)
+                            ax.set_title(f'Distribution of {variable}', fontsize=16)
                         elif isinstance(df[variable].iloc[0], datetime.date):
-                            # Plotting for date variables
+                            # Plotting for date variables with a line plot
                             date_counts = df[variable].dropna().value_counts().sort_index()
-                            date_counts.plot(kind='line', ax=ax)
-                            ax.set_title(f'Serie de tiempo de {variable}')
-                            ax.set_xlabel('Fecha')
-                            ax.set_ylabel('Frecuencia')
+                            date_counts.plot(kind='line', color='green', ax=ax)
+                            ax.set_title(f'Time Series of {variable}', fontsize=16)
+                            ax.set_xlabel('Date', fontsize=12)
+                            ax.set_ylabel('Frequency', fontsize=12)
                         else:
-                            # Plotting for object variables
+                            # Plotting for object variables with better visual handling of categories
                             value_counts = df[variable].value_counts()
-                            sns.barplot(x=value_counts.index, y=value_counts.values, ax=ax)
-                            ax.set_title(f'Frecuencia de {variable}')
+                            sns.barplot(x=value_counts.index, y=value_counts.values, palette='viridis', ax=ax)
+                            ax.set_title(f'Frequency of {variable}', fontsize=16)
                             ax.set_xticklabels(ax.get_xticklabels(), rotation=45, horizontalalignment='right')
+                        ax.set_xlabel(ax.get_xlabel(), fontsize=12)
+                        ax.set_ylabel(ax.get_ylabel(), fontsize=12)
+                        ax.tick_params(labelsize=10)  # Smaller label size
+                        figures.append(fig)  # Append the figure to the list
 
-                        # Append the figure to the list
-                        figures.append(fig)
-
-                # Calculate the number of rows needed based on the number of columns
-                num_rows = math.ceil(len(figures) / num_columns)
+                # Assume you have a Streamlit setup with num_columns defined
+                num_rows = math.ceil(len(figures) / num_columns)  # Calculate the number of rows needed
 
                 # Display the figures in a grid
                 for i in range(num_rows):
@@ -159,9 +170,6 @@ def visualizar_datos_page():
                         if idx < len(figures):
                             with cols[j]:
                                 st.pyplot(figures[idx])
-
-
-
 
 
     else:
