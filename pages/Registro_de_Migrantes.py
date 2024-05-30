@@ -8,9 +8,19 @@ from back.encrypt import encrypt_data, encrypt_large_data
 from dotenv import load_dotenv
 from PIL import Image
 import io
+import requests
 
 def process_photo(photo):
-    image = Image.open(photo)
+    try:
+        if photo is None:
+            raise AttributeError
+        image = Image.open(photo)
+    except AttributeError:
+        # Cargar imagen de silueta desde la URL de Google Drive
+        url = "https://drive.google.com/uc?export=download&id=1UnpvicrZBK2Aj44oj8fWXMgZBY4gMiih"
+        response = requests.get(url)
+        image = Image.open(io.BytesIO(response.content))
+    
     image = image.resize((128, 128))  # Redimensionar la imagen
     buffer = io.BytesIO()
     image.save(buffer, format='PNG')
