@@ -3,19 +3,21 @@ from back.model import SessionLocal, User
 import bcrypt
 import time
 
+# Importar las funciones de las páginas
+from paginas.Buscar_en_DB import buscar_en_db_page
+from paginas.Creacion_de_Usuarios import creacion_de_usuarios_page
+from paginas.Registro_de_Migrantes import registro_migrantes_page
+from paginas.Ver_Usuarios import ver_usuarios_page
+from paginas.Visualizar_datos import visualizar_datos_page
+
+# Configuración de la página (debe ser la primera llamada de Streamlit)
 st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
 
-if st.session_state.get('authenticated'):
-    st.sidebar.write(f"Usuario: {st.session_state['username']}")
-    st.sidebar.write(f"Permisos: {st.session_state['user_type']}")
-    if st.sidebar.button("Cerrar sesión"):
-        # Al hacer clic en cerrar sesión, cambiamos el estado a no autenticado
-        st.session_state.authenticated = False
-        st.rerun()
 
-def menu_principal(username):
-    st.markdown("""
-            # Bienvenido al Sistema de Gestión de Migrantes de casa Monarca :butterfly:
+def menu_principal(username, user_type):
+    if user_type == 'Admin':
+        st.markdown(f"""
+            # Bienvenidx {username}; al Sistema de Gestión de Migrantes de casa Monarca :butterfly: 
 
             Este portal web está diseñado para facilitar la administración y visualización de información de migrantes. Proporciona herramientas tanto para usuarios administradores como para usuarios normales, cada uno con niveles de acceso y capacidades distintas dentro del sistema.
 
@@ -23,27 +25,42 @@ def menu_principal(username):
 
             ### 1. **Registro de Migrantes**
             - **Descripción**: Esta pestaña permite la captura de información detallada de los migrantes.
-            - **Acceso**: Usuarios, colaboradores y administradores.
 
             ### 2. **Buscar en DB**
             - **Descripción**: Funcionalidad exclusiva para administradores que permite realizar consultas específicas dentro de la base de datos para acceder a la información registrada de los migrantes.
-            - **Acceso**: Colaboradores y administradores.
 
             ### 3. **Creación de Usuarios**
             - **Descripción**: Esta sección está reservada para los administradores, quienes pueden crear nuevos usuarios asignando credenciales de acceso como administrador o usuario normal.
-            - **Acceso**: Administradores.
 
             ### 4. **Ver Usuarios**
             - **Descripción**: Permite a los administradores visualizar una lista de todos los usuarios registrados en el sistema, mostrando detalles como el nombre de usuario y el tipo de acceso que poseen.
-            - **Acceso**: Administradores.
                 
             ### 5. **Visualizar datos**
             - **Descripción**: Permite a usuarios y administradores la posibilidad de ver gráficas interactivas y atractivas.
-            - **Acceso**: Colaboradores y administradores.
 
             ## Nota Importante
             Este sistema maneja información sensible. Es crucial mantener la confidencialidad y la seguridad de los datos en todo momento. Cada usuario debe adherirse a las normas de seguridad establecidas para garantizar la protección de la información.
-            """)
+        """)
+    elif user_type == 'User':
+        st.markdown(f"""
+            # Bienvenido {username}; al Sistema de Gestión de Migrantes de casa Monarca :butterfly: 
+
+            Este portal web está diseñado para facilitar la administración y visualización de información de migrantes. Proporciona herramientas para usuarios normales con el objetivo de capturar y visualizar información de manera eficiente y segura.
+
+            ## Páginas y Funcionalidades
+
+            ### 1. **Registro de Migrantes**
+            - **Descripción**: Esta pestaña permite la captura de información detallada de los migrantes.
+
+            ### 2. **Visualizar datos**
+            - **Descripción**: Permite a usuarios y administradores la posibilidad de ver gráficas interactivas y atractivas.
+
+
+            ## Nota Importante
+            Este sistema maneja información sensible. Es crucial mantener la confidencialidad y la seguridad de los datos en todo momento. Cada usuario debe adherirse a las normas de seguridad establecidas para garantizar la protección de la información.
+        """)
+
+
 
 # Inicializamos las variables de sesión si no existen
 if 'authenticated' not in st.session_state:
@@ -84,4 +101,37 @@ def login():
 if not st.session_state['authenticated']:
     login()
 else:
-    menu_principal(st.session_state['username'])
+    # Navegación entre páginas
+    if st.session_state['user_type'] != "Admin":
+        page =  st.sidebar.selectbox("Seleccionar página", ["Menú", "Registro de Migrantes","Visualizar datos"])
+    else:
+        page =  st.sidebar.selectbox("Seleccionar página", ["Menú", "Registro de Migrantes","Visualizar datos","Buscar en DB","Creacion de Usuarios","Ver Usuarios"])
+
+
+    # Manejo de la barra lateral y la sesión
+if st.session_state.get('authenticated'):
+    st.sidebar.write(f"Usuario: {st.session_state['username']}")
+    st.sidebar.write(f"Permisos: {st.session_state['user_type']}")
+    if st.sidebar.button("Cerrar sesión"):
+        # Al hacer clic en cerrar sesión, cambiamos el estado a no autenticado
+        st.session_state.authenticated = False
+        st.session_state.otp_verified = False
+        st.rerun()
+    # Reiniciar estado de la página "Buscar en DB"
+    #if page == "Buscar en DB":
+        #if "otp_verified" in st.session_state: 
+         #   del st.session_state["otp_verified"]
+
+    # Mostrar la página seleccionada
+    if page == "Buscar en DB":
+        buscar_en_db_page()
+    elif page == "Creacion de Usuarios":
+        creacion_de_usuarios_page()
+    elif page == "Registro de Migrantes":
+        registro_migrantes_page()
+    elif page == "Ver Usuarios":
+        ver_usuarios_page()
+    elif page == "Visualizar datos":
+        visualizar_datos_page()
+    elif page == "Menú":
+        menu_principal(st.session_state['username'], st.session_state['user_type'])

@@ -121,7 +121,7 @@ def admin_decrypt_page(private_key):
                 'last_name': decrypt_data(private_key, migrant.last_name),
                 'gender': decrypt_data(private_key, migrant.gender),
                 'birth_date': pd.to_datetime(decrypt_data(private_key, migrant.birth_date)).date(),
-                'age': decrypt_data(private_key, migrant.age),
+                'age': int(decrypt_data(private_key, migrant.age)),
                 'country_of_origin': decrypt_data(private_key, migrant.country_of_origin),
                 'civil_status': decrypt_data(private_key, migrant.civil_status),
                 'has_children': decrypt_data(private_key, migrant.has_children),

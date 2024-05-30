@@ -8,24 +8,25 @@ from back.encrypt import encrypt_data, encrypt_large_data
 from dotenv import load_dotenv
 from PIL import Image
 import io
+import requests
 
 def process_photo(photo):
-    image = Image.open(photo)
+    try:
+        if photo is None:
+            raise AttributeError
+        image = Image.open(photo)
+    except AttributeError:
+        # Cargar imagen de silueta desde la URL de Google Drive
+        url = "https://drive.google.com/uc?export=download&id=1UnpvicrZBK2Aj44oj8fWXMgZBY4gMiih"
+        response = requests.get(url)
+        image = Image.open(io.BytesIO(response.content))
+    
     image = image.resize((128, 128))  # Redimensionar la imagen
     buffer = io.BytesIO()
     image.save(buffer, format='PNG')
     return base64.b64encode(buffer.getvalue()).decode('utf-8')
 
-st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
-
-if st.session_state.get('authenticated'):
-    st.sidebar.write(f"Usuario: {st.session_state['username']}")
-    st.sidebar.write(f"Permisos: {st.session_state['user_type']}")
-    if st.sidebar.button("Cerrar sesión"):
-        # Al hacer clic en cerrar sesión, cambiamos el estado a no autenticado
-        st.session_state.authenticated = False
-
-def input_page():
+def input_page(PUBLIC_KEY, min_date, today):
     st.title("Ingresar Datos")
     with (st.form(key='migrant_form')):
         arrival_date = st.date_input("Fecha de Llegada")
@@ -261,8 +262,8 @@ def input_page():
 
             st.success("¡Datos ingresados exitosamente!")
 
+def registro_migrantes_page():
 
-if __name__ == "__main__":
     st.title('Registro de migrantes :bust_in_silhouette:')
     today = datetime.today()
     min_date = today - timedelta(days=365.25 * 100)
@@ -277,6 +278,6 @@ if __name__ == "__main__":
             public_key_pem = base64.b64decode(public_key_base64)
             PUBLIC_KEY = load_pem_public_key(public_key_pem)
 
-            input_page()
+            input_page(PUBLIC_KEY, min_date, today)
     else:
         st.error('Favor de iniciar sesión para acceder a esta página.')
