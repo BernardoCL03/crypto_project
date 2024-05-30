@@ -1,3 +1,4 @@
+import datetime
 import os
 import streamlit as st
 import base64
@@ -55,8 +56,6 @@ def visualizar_datos_page():
                     if column in variables:
                         dictFilters[column] = list(df[column].unique())
 
-                st.info('Filtros para dashboards')
-
                 if 'filters' not in st.session_state:
                     st.session_state['filters'] = []
 
@@ -74,7 +73,6 @@ def visualizar_datos_page():
                         if key:
                             # Determine the type of data in the column
                             if df[key].dtype == 'int64':
-                                st.info("INT DONE")
                                 # It's an integer, use a slider
                                 value_range = st.slider(
                                     "Seleccione el rango de valores:",
@@ -85,12 +83,14 @@ def visualizar_datos_page():
                                 )
                                 # Update the dictionary to filter between this range
                                 st.session_state['filters'][i] = {key: value_range}
-                            elif pd.api.types.is_datetime64_any_dtype(df[key]):
+                            elif isinstance(df[key].iloc[0], datetime.date):
                                 # It's a datetime, use a date input
-                                date_range = st.date_input(
-                                    "Seleccione el rango de fechas:",
-                                    value=(df[key].min(), df[key].max()),
-                                    key=f'date_range_{i}'
+                                date_range = st.slider(
+                                    "Seleccione el rango de valores:",
+                                    min_value=(df[key].min()),
+                                    max_value=(df[key].max()),
+                                    value=((df[key].min()), (df[key].max())),
+                                    key=f'range_slider_{i}'
                                 )
                                 st.session_state['filters'][i] = {key: date_range}
                             else:

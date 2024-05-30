@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+
 from cryptography.hazmat.primitives.asymmetric import rsa, padding
 from cryptography.hazmat.primitives import serialization, hashes
 from cryptography.hazmat.primitives.serialization import load_pem_private_key, load_pem_public_key
@@ -115,7 +117,7 @@ def admin_decrypt_page(private_key):
             
             decrypted_migrant = {
                 'id': migrant.id,
-                'arrival_date': pd.to_datetime(decrypt_data(private_key, migrant.arrival_date)).date(),
+                'arrival_date': datetime.strptime((decrypt_data(private_key, migrant.arrival_date)), "%Y-%m-%d").date(),
                 'type': decrypt_data(private_key, migrant.type),
                 'name': decrypt_data(private_key, migrant.name),
                 'last_name': decrypt_data(private_key, migrant.last_name),
@@ -125,7 +127,7 @@ def admin_decrypt_page(private_key):
                 'country_of_origin': decrypt_data(private_key, migrant.country_of_origin),
                 'civil_status': decrypt_data(private_key, migrant.civil_status),
                 'has_children': decrypt_data(private_key, migrant.has_children),
-                'children_traveling': decrypt_data(private_key, migrant.children_traveling),
+                'children_traveling': int(decrypt_data(private_key, migrant.children_traveling)),
                 'can_return_to_country': decrypt_data(private_key, migrant.can_return_to_country),
                 'reason_cannot_return': decrypt_data(private_key, migrant.reason_cannot_return),
                 'access_to_casa_monarca': decrypt_data(private_key, migrant.access_to_casa_monarca),
