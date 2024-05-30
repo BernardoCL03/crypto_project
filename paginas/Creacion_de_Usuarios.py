@@ -34,7 +34,7 @@ def creacion_de_usuarios_page():
 
                 username = st.text_input("Nombre de usuario")
                 password = st.text_input("Contraseña", type="password")
-                privileges = st.radio("Privilegios", options=['User', 'Admin'])
+                privileges = st.radio("Privilegios", options=['Colaborador','User', 'Admin'])
 
             # Contraseña de mínimo 8 de longitus, con mayúscula y un signo
             def validate_password(password):
