@@ -9,6 +9,7 @@ from paginas.Creacion_de_Usuarios import creacion_de_usuarios_page
 from paginas.Registro_de_Migrantes import registro_migrantes_page
 from paginas.Ver_Usuarios import ver_usuarios_page
 from paginas.Visualizar_datos import visualizar_datos_page
+from paginas.Registro_de_Logs import ver_logs
 
 # Configuración de la página (debe ser la primera llamada de Streamlit)
 st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
@@ -122,7 +123,7 @@ if not st.session_state['authenticated']:
 else:
     # Navegación entre páginas
     if st.session_state['user_type'] == "Admin":
-        page =  st.sidebar.selectbox("Seleccionar página", ["Menú", "Registro de Migrantes","Visualizar datos","Buscar en DB","Creacion de Usuarios","Ver Usuarios"])
+        page =  st.sidebar.selectbox("Seleccionar página", ["Menú", "Registro de Migrantes","Visualizar datos","Buscar en DB","Creacion de Usuarios","Ver Usuarios", "Ver Registro Logs"])
     elif st.session_state['user_type'] == 'User':
         page =  st.sidebar.selectbox("Seleccionar página", ["Menú", "Registro de Migrantes","Visualizar datos", 'Buscar en DB'])
     elif st.session_state['user_type'] == 'Colaborador':
@@ -154,5 +155,7 @@ if st.session_state.get('authenticated'):
         ver_usuarios_page()
     elif page == "Visualizar datos":
         visualizar_datos_page()
+    elif page == 'Ver Registro Logs':
+        ver_logs()
     elif page == "Menú":
         menu_principal(st.session_state['username'], st.session_state['user_type'])

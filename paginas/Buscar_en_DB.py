@@ -12,7 +12,7 @@ import pandas as pd
 import datetime
 from datetime import datetime, date
 # our decrypt data function
-from back.model import SessionLocal, General # table names
+from back.model import SessionLocal, General, Logs # table names
 from back.encrypt import decrypt_data, decrypt_large_data, admin_decrypt_page, encrypt_data
 
 #st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
@@ -161,10 +161,23 @@ def buscar_en_db_page():
                                 except IndexError:
                                     st.write(" ")
 
+                    # Apretamos el boton para consultar la consulta
                     if selected_migrant and selected_id and st.button('Consultar información', key='consultar_info'):
                         st.session_state['selected_migrant'] = selected_migrant
                         st.session_state['selected_id'] = selected_id
                         st.session_state['consult'] = True
+
+                        # Debemos registrar en los logs la consulta realizada
+                        with SessionLocal() as session:
+                            log_entry = Logs(
+                                action="Migrant information",
+                                user_name=st.session_state['username'],  # Nombre de usuario del admin que crea el usuario
+                                user_type=st.session_state['user_type'], # Los permisos de usuario (admin unicamente)
+                                description=f"Usuario '{st.session_state['username']}' con ID '{st.session_state['id']}' consultó información de migrante: '{selected_migrant}'." # descripcion de lo sucedido
+                            )
+                            session.add(log_entry)
+                            session.commit()
+
                         st.rerun()
 
                 if st.session_state.get('consult'):
@@ -237,7 +250,19 @@ def buscar_en_db_page():
                                             migrant.current_member = encrypt_data(PUBLIC_KEY, 'no')
                                             migrant.reason_departure = encrypt_data(PUBLIC_KEY, reason_departure)
                                             migrant.date_departure = encrypt_data(PUBLIC_KEY, date_departure.strftime('%Y-%m-%d'))
+                                            
+                                            # Igual debemos registrar esta información en los LOGS!
+                                            log_entry = Logs(
+                                                action="Migrant information",
+                                                user_name=st.session_state['username'],  # Nombre de usuario del admin que dio de baja al migrante
+                                                user_type=st.session_state['user_type'],
+                                                description=f"Usuario '{st.session_state['username']}' con ID '{st.session_state['id']}' dio de baja a migrante: '{selected_migrant} '." 
+                                            )
+
+                                            session.add(log_entry)
+
                                             session.commit()
+
                                         st.success('Migrante dado de baja exitosamente.')
                                         del st.session_state['selected_migrant']
                                         del st.session_state['selected_id']

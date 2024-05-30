@@ -3,7 +3,7 @@ import streamlit as st
 import base64
 from datetime import datetime, timedelta
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
-from back.model import SessionLocal, Health, Education, Transit, General # table names
+from back.model import SessionLocal, Health, Education, Transit, General, Logs # table names
 from back.encrypt import encrypt_data, encrypt_large_data
 from dotenv import load_dotenv
 from PIL import Image
@@ -42,14 +42,13 @@ def input_page(PUBLIC_KEY, min_date, today):
         children_traveling = st.number_input("¿Cuántos hijos están viajando con usted?", min_value=0) if has_children == 'Si' else 0
         can_read_write = st.radio("Puede Leer y Escribir", options=['Sí', 'No'])
         last_grade_study = st.selectbox("Último Grado de Estudio", options=['Preescolar', 'Primaria', 'Secundaria', 'Bachillerato', 'Bachillerato Técnico', 'Universidad', 'No Escolarizado'])
-        # TODO: fix languages to appear in db
         languages_spoken = st.multiselect("Idiomas que Habla", options=['Inglés', 'Español', 'Francés', 'Criollo Haitiano', 'Garífuna', 'Otro'])
         other_language = st.text_input("Si habla otro idioma, especifique")
         if 'Otro' not in languages_spoken:
             other_language = 'NA'
         date_left_origin = st.date_input("Fecha en que Dejó el País de Origen", max_value=today, value=today)
         traveling_alone_accompanied = st.radio("Viajando Solo o Acompañado", options=['Solo', 'Acompañado'], index=1)
-        who_accompanied = st.radio("¿Por quién está siendo acompañado/a?", # TODO fix potential bug, algunas veces aparece, otras veces no...
+        who_accompanied = st.radio("¿Por quién está siendo acompañado/a?",
                                    options=[
                                        'Hijo/a', 'Pareja', 'Pareja e hijo/a', 'Mamá', 'Papá', 'Mamá y papá','Primo/a','Amigo/a',
                                        'Otro pariente']) if traveling_alone_accompanied == 'Acompañado' else 'NA'
@@ -194,7 +193,7 @@ def input_page(PUBLIC_KEY, min_date, today):
                 date_departure=encrypt_data(PUBLIC_KEY, 'NA')
             )
             session.add(new_general)
-            session.commit()  # Commit to get the ID
+            session.commit()  # Commit to get the ID for foreign keys for following 3 tables
     
             # Use the ID from the general record for related tables
             new_education = Education(
@@ -252,12 +251,22 @@ def input_page(PUBLIC_KEY, min_date, today):
             last_shelter=encrypt_data(PUBLIC_KEY, last_shelter)
              )
     
-            # Add the records for related tables
+            # Añadimos información a sus respectivas tablas
             session.add(new_education)
             session.add(new_health)
             session.add(new_transit)
-    
-            # Commit all changes
+
+            # Añadimos los logs a su tabla
+            log_entry = Logs(
+                action="Registered migrant",
+                user_name=st.session_state['username'],  # Nombre de usuario del admin que crea el usuario
+                user_type=st.session_state['user_type'], # Los permisos de usuario (admin unicamente)
+                description=f"Usuario '{st.session_state['username']}' con ID '{st.session_state['id']}' registró migrante '{name} {last_name}'." # descripcion de lo sucedido
+            )
+
+            session.add(log_entry)
+
+            # Hacemos commit a todos los cambios (no hay necesidad de session.close, ya que se hace automatico gracias al with SessionLocal())
             session.commit()
 
             st.success("¡Datos ingresados exitosamente!")

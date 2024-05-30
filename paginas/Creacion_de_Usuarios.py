@@ -1,4 +1,4 @@
-from back.model import SessionLocal, User
+from back.model import SessionLocal, User, Logs
 from sqlalchemy.exc import IntegrityError
 import streamlit as st
 import re
@@ -34,7 +34,7 @@ def creacion_de_usuarios_page():
 
                 username = st.text_input("Nombre de usuario")
                 password = st.text_input("Contraseña", type="password")
-                privileges = st.radio("Privilegios", options=['User', 'Admin'])
+                privileges = st.radio("Privilegios", options=['Colaborador','User', 'Admin'])
 
             # Contraseña de mínimo 8 de longitus, con mayúscula y un signo
             def validate_password(password):
@@ -74,6 +74,15 @@ def creacion_de_usuarios_page():
                             new_user = User(username=username, user_type=privileges)
                             new_user.set_password(password)  # Hasheamos la contraseña y así la almacenamos
                             session.add(new_user)
+
+                            # Registramos en los logs la creacion del usuario
+                            log_entry = Logs(
+                                action="User management",
+                                user_name=st.session_state['username'],  # Nombre de usuario del admin que crea el usuario
+                                user_type=st.session_state['user_type'], # Los permisos de usuario (admin unicamente)
+                                description=f"Usuario '{st.session_state['username']}' con ID '{st.session_state['id']}' creó  usuario '{username}' con permisos de '{privileges}'" # descripcion de lo sucedido
+                            )
+                            session.add(log_entry)
                             session.commit()
                             st.success("Usuario creado con éxito.")
                     except IntegrityError:

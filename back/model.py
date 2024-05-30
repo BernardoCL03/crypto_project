@@ -153,9 +153,9 @@ try:
         __tablename__ = 'logs'
         id = Column(Integer, primary_key=True, autoincrement=True)
         timestamp = Column(DateTime, default=lambda: datetime.now(pytz.timezone('America/Monterrey')), nullable=False)
-        action = Column(String(20), nullable=False)
-        user_name = Column(String, ForeignKey('users.username'), nullable=False)
-        user_type = Column(String, ForeignKey('users.user_type'), nullable=False )
+        action = Column(String(50), nullable=False)
+        user_name = Column(String(50), ForeignKey('users.username'), nullable=False)
+        user_type = Column(Enum('User', 'Colaborador', 'Admin', name = 'user_types'), default='User', nullable=False)
         description = Column(String(100), nullable=True)
 
     # Crear todas las tablas en la base de datos
