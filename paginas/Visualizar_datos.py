@@ -32,6 +32,7 @@ def visualizar_datos_page():
                 PRIVATE_KEY = load_pem_private_key(private_key_pem, password=TOTP_SECRET.encode())
                 data = admin_decrypt_page(PRIVATE_KEY)
                 df = pd.json_normalize(data, sep='_')
+                df = df[df['current_member'] == 'si']
                 st.info('Cantidad de migrantes en Casa Monarca')
                 st.markdown(f"""
                 <div style='background-color:#000000; border: 1px solid #dcdcdc; padding: 5px; border-radius: 5px; text-align: center;'>
