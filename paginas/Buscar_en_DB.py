@@ -31,7 +31,7 @@ def buscar_en_db_page():
             if not st.session_state['otp_verified']:
 
                 st.markdown("""
-                    #### Bienvenid@ a la sección de administración. Esta página está diseñada exclusivamente para el acceso y la gestión por parte de administradores autorizados.
+                    #### Bienvenid@ a la sección de administración. Esta página está diseñada exclusivamente para el acceso y la gestión por parte de usuarios autorizados.
 
                     ## Información Sensible
 
@@ -39,11 +39,11 @@ def buscar_en_db_page():
 
                     ### Acceso Restringido
 
-                    **Solo los administradores tienen acceso a esta página.** Si usted está aquí, es porque ha sido verificado y autorizado para manejar dichos datos. Le pedimos proceder con la máxima precaución y responsabilidad.
+                    ** Si usted está aquí, es porque ha sido verificado y autorizado para manejar dichos datos. Le pedimos proceder con la máxima precaución y responsabilidad. **
 
                     ### Responsabilidad
 
-                    Como administrador, tiene la responsabilidad de:
+                    Usted tiene la responsabilidad de:
                     - **Proteger la confidencialidad y la integridad de la información.**
                     - **Asegurar que el acceso a los datos se realice de forma segura y solo cuando sea estrictamente necesario.**
 

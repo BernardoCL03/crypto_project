@@ -123,7 +123,7 @@ if not st.session_state['authenticated']:
 else:
     # Navegación entre páginas
     if st.session_state['user_type'] == "Admin":
-        page =  st.sidebar.selectbox("Seleccionar página", ["Menú", "Registro de Migrantes","Visualizar datos","Buscar en DB","Creacion de Usuarios","Ver Usuarios", "Ver Registro Logs"])
+        page =  st.sidebar.selectbox("Seleccionar página", ["Menú", "Registro de Migrantes","Visualizar datos","Buscar en DB","Creación de Usuarios","Ver Usuarios", "Ver Registro Logs"])
     elif st.session_state['user_type'] == 'User':
         page =  st.sidebar.selectbox("Seleccionar página", ["Menú", "Registro de Migrantes","Visualizar datos", 'Buscar en DB'])
     elif st.session_state['user_type'] == 'Colaborador':
@@ -139,15 +139,11 @@ if st.session_state.get('authenticated'):
         st.session_state.authenticated = False
         st.session_state.otp_verified = False
         st.rerun()
-    # Reiniciar estado de la página "Buscar en DB"
-    #if page == "Buscar en DB":
-        #if "otp_verified" in st.session_state: 
-         #   del st.session_state["otp_verified"]
 
     # Mostrar la página seleccionada
     if page == "Buscar en DB":
         buscar_en_db_page()
-    elif page == "Creacion de Usuarios":
+    elif page == "Creación de Usuarios":
         creacion_de_usuarios_page()
     elif page == "Registro de Migrantes":
         registro_migrantes_page()
