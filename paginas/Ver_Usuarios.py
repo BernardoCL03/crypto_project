@@ -1,6 +1,6 @@
 import streamlit as st
 import pandas as pd
-from back.model import SessionLocal, User
+from back.model import SessionLocal, User, Logs
 
 def ver_usuarios_page():
     # Título para la sección de visualización
@@ -35,6 +35,16 @@ def ver_usuarios_page():
                                 user_to_update.user_type = new_user_type
                                 session.commit()
                                 st.success(f"El nivel de acceso del usuario '{selected_username}' ha sido actualizado a '{new_user_type}'.")
+                                log_entry = Logs(
+                                    action="User Management",
+                                    user_name=st.session_state['username'],  # Nombre de usuario del admin que dio de baja al migrante
+                                    user_type=st.session_state['user_type'],
+                                    description=f"Usuario '{st.session_state['username']}' con ID '{st.session_state['id']}' actualizó el acceso de usuario: '{selected_username}' a {new_user_type}." 
+                                )
+
+                                session.add(log_entry)
+
+                                session.commit()
                                 st.rerun()  # Reiniciar la página
                             else:
                                 st.error("Usuario no encontrado.")
@@ -53,6 +63,16 @@ def ver_usuarios_page():
                                 session.delete(user_to_delete)
                                 session.commit()
                                 st.success(f"El usuario '{selected_username_to_delete}' ha sido dado de baja del sistema.")
+                                log_entry = Logs(
+                                    action="User Management",
+                                    user_name=st.session_state['username'],  # Nombre de usuario del admin que dio de baja al migrante
+                                    user_type=st.session_state['user_type'],
+                                    description=f"Usuario '{st.session_state['username']}' con ID '{st.session_state['id']}' dio de baja al usuario: '{selected_username_to_delete}' del sistema." 
+                                )
+
+                                session.add(log_entry)
+
+                                session.commit()
                                 st.rerun()  # Reiniciar la página
                             else:
                                 st.error("Usuario no encontrado.")
