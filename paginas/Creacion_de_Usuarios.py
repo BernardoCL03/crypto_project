@@ -77,7 +77,7 @@ def creacion_de_usuarios_page():
 
                             # Registramos en los logs la creacion del usuario
                             log_entry = Logs(
-                                action="User management",
+                                action="User Management",
                                 user_name=st.session_state['username'],  # Nombre de usuario del admin que crea el usuario
                                 user_type=st.session_state['user_type'], # Los permisos de usuario (admin unicamente)
                                 description=f"Usuario '{st.session_state['username']}' con ID '{st.session_state['id']}' creó  usuario '{username}' con permisos de '{privileges}'" # descripcion de lo sucedido
