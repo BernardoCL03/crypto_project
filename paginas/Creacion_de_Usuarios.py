@@ -16,7 +16,7 @@ def creacion_de_usuarios_page():
                 st.success("Página de creación de usuarios")
                 
                 st.markdown(f"""
-                ¡Bienvenido, <b>{st.session_state['username']}!</b> En este apartado podrás crear usuarios con los permisos que desees (usuario normal o admin). Es necesario:
+                ¡Bienvenido, <b>{st.session_state['username']}!</b> En este apartado podrás crear usuarios con los permisos que desees (Colaborador, Usuario o Admin). Es necesario:
                 <ul style='list-style-type:none;'>
                     <li><b>Nombre de usuario:</b></li>
                         <ul style='list-style-type:none; margin-left: 20px;'>  <!-- Ahi se anade el margen a la izquierda para la indentacion -->
@@ -28,7 +28,7 @@ def creacion_de_usuarios_page():
                             <li>Debe contener al menos 1 letra mayúscula</li>
                             <li>Debe contener al menos 1 símbolo (no alfanumérico)</li>
                         </ul>
-                    <li><b>Permisos (user por default)</b></li>
+                    <li><b>Permisos (Colaborador por default)</b></li>
                 </ul>
                 """, unsafe_allow_html=True)
 

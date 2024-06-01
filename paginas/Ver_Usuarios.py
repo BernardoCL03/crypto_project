@@ -4,13 +4,38 @@ from back.model import SessionLocal, User, Logs
 
 def ver_usuarios_page():
     # Título para la sección de visualización
-    st.title('Usuarios Registrados')
+    st.title('Manejo de usuarios')
 
     # Crear una sesión para consultar la base de datos
     session = SessionLocal()
 
     if st.session_state.get('authenticated'):
         if st.session_state['user_type'] == 'Admin':
+            st.markdown("""
+                ## Funcionalidades de la Página
+                        
+                En esta página, los administradores pueden gestionar los usuarios registrados en el sistema. Las funcionalidades disponibles son:
+
+                - **Visualizar Usuarios Registrados**: Muestra una tabla con todos los usuarios registrados, incluyendo sus nombres de usuario y niveles de acceso.
+                - **Cambiar Nivel de Acceso de Usuario**: Permite actualizar el nivel de acceso de un usuario seleccionado.
+                - **Dar de Baja a un Usuario**: Permite eliminar un usuario del sistema.
+
+                ### Instrucciones de Uso:
+
+                1. **Visualizar Usuarios Registrados**:
+                    - Los usuarios registrados se muestran automáticamente en una tabla al cargar la página.
+
+                2. **Cambiar Nivel de Acceso de Usuario**:
+                    - Seleccione el nombre del usuario en el menú desplegable.
+                    - Elija el nuevo nivel de acceso.
+                    - Haga clic en "Actualizar Nivel de Acceso" para guardar los cambios.
+
+                3. **Dar de Baja a un Usuario**:
+                    - Seleccione el nombre del usuario a eliminar en el menú desplegable.
+                    - Haga clic en "Dar de Baja" para eliminar el usuario del sistema.
+
+                > **Nota**: Todas las acciones se registran en el sistema de logs para garantizar la seguridad y la trazabilidad.
+            """)
             try:
                 # Obtener todos los usuarios
                 users = session.query(User).all()

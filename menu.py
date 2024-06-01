@@ -17,6 +17,7 @@ st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
 
 def menu_principal(username, user_type):
     if user_type == 'Admin':
+        
         st.markdown(f"""
             # ¡Bienvenido {username}, al Sistema de Gestión de Migrantes de casa Monarca :butterfly:! 
 
@@ -33,8 +34,8 @@ def menu_principal(username, user_type):
             ### 3. **Creación de Usuarios**
             - **Descripción**: Esta sección está reservada para los administradores, quienes pueden crear nuevos usuarios asignando credenciales de acceso como administrador o usuario normal.
 
-            ### 4. **Ver Usuarios**
-            - **Descripción**: Permite a los administradores visualizar una lista de todos los usuarios registrados en el sistema, mostrando detalles como el nombre de usuario y el tipo de acceso que poseen.
+            ### 4. **Manejo de Usuarios**
+            - **Descripción**: Permite a los administradores visualizar una lista de todos los usuarios, así como manejar los niveles acceso de estos.
                 
             ### 5. **Visualizar datos**
             - **Descripción**: Permite a usuarios y administradores la posibilidad de ver gráficas interactivas y atractivas.
@@ -45,6 +46,7 @@ def menu_principal(username, user_type):
             ## Nota Importante
             Este sistema maneja información sensible. Es crucial mantener la confidencialidad y la seguridad de los datos en todo momento. Cada usuario debe adherirse a las normas de seguridad establecidas para garantizar la protección de la información.
         """)
+        
     elif user_type == 'User':
         st.markdown(f"""
             # ¡Bienvenido {username}, al Sistema de Gestión de Migrantes de casa Monarca :butterfly:! 
@@ -123,7 +125,7 @@ if not st.session_state['authenticated']:
 else:
     # Navegación entre páginas
     if st.session_state['user_type'] == "Admin":
-        page =  st.sidebar.selectbox("Seleccionar página", ["Menú", "Registro de Migrantes","Visualizar datos","Buscar en DB","Creación de Usuarios","Ver Usuarios", "Ver Registro Logs"])
+        page =  st.sidebar.selectbox("Seleccionar página", ["Menú", "Registro de Migrantes","Visualizar datos","Buscar en DB","Creación de Usuarios","Manejo de Usuarios", "Ver Registro Logs"])
     elif st.session_state['user_type'] == 'User':
         page =  st.sidebar.selectbox("Seleccionar página", ["Menú", "Registro de Migrantes","Visualizar datos", 'Buscar en DB'])
     elif st.session_state['user_type'] == 'Colaborador':
@@ -147,7 +149,7 @@ if st.session_state.get('authenticated'):
         creacion_de_usuarios_page()
     elif page == "Registro de Migrantes":
         registro_migrantes_page()
-    elif page == "Ver Usuarios":
+    elif page == "Manejo de Usuarios":
         ver_usuarios_page()
     elif page == "Visualizar datos":
         visualizar_datos_page()
