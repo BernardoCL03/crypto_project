@@ -66,7 +66,7 @@ try:
         reason_cannot_return = Column(String(1024), nullable=True)
         access_to_casa_monarca = Column(String(1024), nullable=True)
         reason_for_denial = Column(String(1024), nullable=True)
-        services_provided = Column(String(1024), nullable=True)
+        services_provided = Column(String, nullable=True)
         assigned_dormitory = Column(String(1024), nullable=True)
         distinctive_signs = Column(String(1024), nullable=True)
         emergency_contact = Column(String(1024), nullable=True)
@@ -75,6 +75,7 @@ try:
         front_photo = Column(String, nullable=True)
         right_profile_photo = Column(String, nullable=True)
         left_profile_photo = Column(String, nullable=True)
+        refugee = Column(String, nullable=True)
         current_member = Column(String, nullable=True)
         reason_departure = Column(String, nullable=True)
         date_departure = Column(String, nullable=True)
@@ -156,7 +157,7 @@ try:
         action = Column(String(50), nullable=False)
         user_name = Column(String(50), ForeignKey('users.username'), nullable=False)
         user_type = Column(Enum('User', 'Colaborador', 'Admin', name = 'user_types'), default='User', nullable=False)
-        description = Column(String(100), nullable=True)
+        description = Column(String(1000), nullable=True)
 
     # Crear todas las tablas en la base de datos
     Base.metadata.create_all(engine)

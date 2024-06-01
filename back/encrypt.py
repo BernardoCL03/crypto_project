@@ -132,6 +132,7 @@ def admin_decrypt_page(private_key):
                 'reason_cannot_return': decrypt_data(private_key, migrant.reason_cannot_return),
                 'access_to_casa_monarca': decrypt_data(private_key, migrant.access_to_casa_monarca),
                 'reason_for_denial': decrypt_data(private_key, migrant.reason_for_denial),
+                'refugee': decrypt_data(private_key,migrant.refugee),
                 'services_provided': decrypt_data(private_key, migrant.services_provided),
                 'assigned_dormitory': decrypt_data(private_key, migrant.assigned_dormitory),
                 'distinctive_signs': decrypt_data(private_key, migrant.distinctive_signs),

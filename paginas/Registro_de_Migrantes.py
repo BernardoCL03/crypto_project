@@ -118,6 +118,7 @@ def input_page(PUBLIC_KEY, min_date, today):
         last_shelter = st.text_input("¿Cuál fue el último albergue en el que estuvo?")
         access_to_casa_monarca = st.radio("¿Se le brindó acceso al albergue de Casa Monarca?",options=['Sí', 'No'], index=1)
         reason_for_denial = st.text_input("¿Por qué se le negó el acceso al albergue?") if access_to_casa_monarca == 'No' else 'NA'
+        refugee = st.radio("¿La persona se encuentra en condición de refugiado?", options=['Sí','No'])
         services_provided = st.multiselect(
             "¿Cuáles servicios se le brindaron a la persona?",
             options=[
@@ -188,6 +189,7 @@ def input_page(PUBLIC_KEY, min_date, today):
                 front_photo = ",".join(encrypted_front_photo),
                 right_profile_photo=",".join(encrypted_right_profile_photo),
                 left_profile_photo=",".join(encrypted_left_profile_photo),
+                refugee=encrypt_data(PUBLIC_KEY, refugee),
                 current_member=encrypt_data(PUBLIC_KEY, 'si'),
                 reason_departure=encrypt_data(PUBLIC_KEY, 'NA'),
                 date_departure=encrypt_data(PUBLIC_KEY, 'NA')
