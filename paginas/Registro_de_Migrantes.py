@@ -29,7 +29,7 @@ def process_photo(photo):
 def input_page(PUBLIC_KEY, min_date, today):
     st.title("Ingresar Datos")
     with (st.form(key='migrant_form')):
-        arrival_date = st.date_input("Fecha de Llegada")
+        arrival_date = st.date_input("Fecha de Llegada", max_value=today, value = today)
         type = st.selectbox('Tipo de registro', options=['Adulto', 'Niña acompañada', 'Niño acompañado', 'Adolescente acompañado', 'Niña no acompañada', 'Niño no acompañado', 'Adolescente no acompañado'])
         name = st.text_input("Nombre")
         last_name = st.text_input("Apellidos")
@@ -70,7 +70,7 @@ def input_page(PUBLIC_KEY, min_date, today):
                                    '61,000 a 100,000 MX ($3,000 a 5,000 US)',
                                    'Más de 100,000 MX ($5,000 US)'
                                ]) if paid_guide == 'Sí' else 'NA'
-        date_entered_mexico = st.date_input("Fecha en que ingresó a México")
+        date_entered_mexico = st.date_input("Fecha en que ingresó a México", max_value=today, value=today)
         entry_point_mexico = st.radio("¿Por dónde ingresó a México?",
                                       options=[
                                           'Tapachula',
@@ -115,8 +115,8 @@ def input_page(PUBLIC_KEY, min_date, today):
         months_pregnant = st.radio("¿Cuántos meses de embarazo tiene?", options=['1 mes', '2 meses', '3 meses', '4 meses', '5 meses', '6 meses', '7 meses', '8 meses', '9 meses', 'NA'],) if is_pregnant == 'Sí' else 'NA'
         has_prenatal_care = st.radio("¿Cuenta con control prenatal?",options=['Sí', 'No']) if is_pregnant == 'Sí' else 'NA'
         stayed_in_shelter = st.radio("En su trayecto por México, ¿Usted se ha estado en algún otro albergue?",options=['Sí', 'No'])
-        last_shelter = st.text_input("¿Cuál fue el último albergue en el que estuvo?")
-        access_to_casa_monarca = st.radio("¿Se le brindó acceso al albergue de Casa Monarca?",options=['Sí', 'No'], index=1)
+        last_shelter = st.text_input("¿Cuál fue el último albergue en el que estuvo?") if stayed_in_shelter == 'Sí' else 'NA'
+        access_to_casa_monarca = st.radio("¿Se le brindó acceso al albergue de Casa Monarca?",options=['Sí', 'No'], index=0)
         reason_for_denial = st.text_input("¿Por qué se le negó el acceso al albergue?") if access_to_casa_monarca == 'No' else 'NA'
         refugee = st.radio("¿La persona se encuentra en condición de refugiado?", options=['Sí','No'])
         services_provided = st.multiselect(
@@ -136,7 +136,7 @@ def input_page(PUBLIC_KEY, min_date, today):
                 'Canalización a servicios prisológicos',
                 'Atención psicosocial'
             ]
-        )
+        ) if access_to_casa_monarca == 'Sí' else 'NA'
         assigned_dormitory = st.radio(
             "Dormitorio en el cual se asignó",
             options=[
