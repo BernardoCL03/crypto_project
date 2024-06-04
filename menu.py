@@ -12,7 +12,7 @@ from paginas.Visualizar_datos import visualizar_datos_page
 from paginas.Registro_de_Logs import ver_logs
 
 # Configuración de la página (debe ser la primera llamada de Streamlit)
-st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:')
+st.set_page_config(page_title='Casa Monarca', page_icon=':butterfly:',layout='wide')
 
 
 def menu_principal(username, user_type):
