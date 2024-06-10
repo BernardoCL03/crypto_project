@@ -3,7 +3,7 @@ import streamlit as st
 import base64
 import pyotp
 import time
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 import pandas as pd
@@ -51,8 +51,8 @@ def buscar_en_db_page():
                 st.warning("Ingrese la OTP para acceder a esta página")
                 opt_input = st.text_input("OTP", type = "password")
 
-                dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
-                load_dotenv(dotenv_path=dotenv_path)
+                #dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+                #load_dotenv(dotenv_path=dotenv_path)
                 TOTP_SECRET = os.getenv("TOTP_SECRET")
 
                 totp = pyotp.TOTP(TOTP_SECRET)
@@ -66,8 +66,8 @@ def buscar_en_db_page():
 
             if st.session_state['otp_verified']:
 
-                dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
-                load_dotenv(dotenv_path=dotenv_path)
+                #dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+                #load_dotenv(dotenv_path=dotenv_path)
                 TOTP_SECRET = os.getenv("TOTP_SECRET")
 
                 # leemos en formato base64, tenemos que convertirla a objeto valido

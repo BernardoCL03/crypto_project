@@ -6,7 +6,7 @@ from sqlalchemy import create_engine, Column, Integer, String, Enum, DateTime, F
 from sqlalchemy.engine import URL
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 import bcrypt # pswd hashing
 import pytz # zonas horarias
 
@@ -14,10 +14,10 @@ import pytz # zonas horarias
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+#dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
 
 # Load the environment variables from the specified path
-load_dotenv(dotenv_path=dotenv_path)
+#load_dotenv(dotenv_path=dotenv_path)
 
 # Define the SQL engine, SQLite is used here for simplicity
 CONN_STRING = os.getenv('DATABASE_URL')

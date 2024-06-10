@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from cryptography.hazmat.primitives.serialization import load_pem_public_key
 from back.model import SessionLocal, Health, Education, Transit, General, Logs # table names
 from back.encrypt import encrypt_data, encrypt_large_data
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from PIL import Image
 import io
 import requests
@@ -281,8 +281,8 @@ def registro_migrantes_page():
     if st.session_state.get('authenticated'):
         if st.session_state['user_type'] == 'Admin' or st.session_state['user_type'] == 'Colaborador' or st.session_state['user_type'] == 'User':
             # cargamos .env
-            dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
-            load_dotenv(dotenv_path=dotenv_path)
+            #dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+            #load_dotenv(dotenv_path=dotenv_path)
 
             # leemos en formato base64, tenemos que convertirla a objeto valido
             public_key_base64 = os.getenv('PUBLIC_KEY')

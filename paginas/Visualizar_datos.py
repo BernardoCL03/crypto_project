@@ -2,7 +2,7 @@ import datetime
 import os
 import streamlit as st
 import base64
-from dotenv import load_dotenv
+#from dotenv import load_dotenv
 from cryptography.hazmat.primitives.serialization import load_pem_private_key
 import pandas as pd
 import plotly.express as px
@@ -21,8 +21,8 @@ def visualizar_datos_page():
             if st.session_state['user_type'] == 'Admin' or st.session_state['user_type'] == 'User':
 
                 # Desencriptar todos los datos
-                dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
-                load_dotenv(dotenv_path=dotenv_path)
+                #dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+                #load_dotenv(dotenv_path=dotenv_path)
                 TOTP_SECRET = os.getenv("TOTP_SECRET")
 
                 # leemos en formato base64, tenemos que convertirla a objeto valido

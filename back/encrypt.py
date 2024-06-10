@@ -11,9 +11,9 @@ import pandas as pd
 import pyotp
 
 
-dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
+#dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
 
-load_dotenv(dotenv_path=dotenv_path)
+#load_dotenv(dotenv_path=dotenv_path)
 
 """
 #ESTAS FUNCIONES ESTAN COMENTADAS PORQUE SOLO SE UTILIZAN UNA SOLA VEZ PARA LA CREACION DE LA PUBLIC Y PRIVATE KEYS.
